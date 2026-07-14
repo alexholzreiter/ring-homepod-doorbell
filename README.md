@@ -76,9 +76,9 @@ Das Verzeichnis `runtipi/` enthält zusätzlich dieselbe Appdefinition als
 einzeln kopierbares Paket.
 
 Die App verwendet das Image
-`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.6`. Der Workflow
+`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.7`. Der Workflow
 `.github/workflows/container.yml` veröffentlicht es für `amd64` und `arm64`,
-sobald das Git-Tag `v0.2.6` gepusht wird.
+sobald das Git-Tag `v0.2.7` gepusht wird.
 
 Nach der ersten Veröffentlichung muss das Container-Paket auf GitHub öffentlich
 sichtbar sein, damit Runtipi es ohne Registry-Anmeldung laden kann.

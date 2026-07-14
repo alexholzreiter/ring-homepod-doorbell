@@ -45,6 +45,15 @@ services:
     container_name: ring-homepod-doorbell-owntone
     restart: unless-stopped
     network_mode: host
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        sed -i 's|^command_args=.*|command_args="-f"|' /etc/init.d/owntone
+        sed -i '/^command=/a supervisor="supervise-daemon"' /etc/init.d/owntone
+        sed -i '/^command=/a respawn_delay=3' /etc/init.d/owntone
+        sed -i '/^command=/a respawn_max=0' /etc/init.d/owntone
+        exec /sbin/init
     depends_on:
       prepare:
         condition: service_completed_successfully
@@ -52,7 +61,6 @@ services:
       UID: ${PUID:-1000}
       GID: ${PGID:-1000}
     volumes:
-      - ./owntone.initd:/etc/init.d/owntone:ro
       - ./data/owntone-config:/etc/owntone:ro
       - ./data/media:/srv/media
       - ./data/owntone-cache:/var/cache/owntone
