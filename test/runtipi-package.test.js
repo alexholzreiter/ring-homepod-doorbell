@@ -24,3 +24,14 @@ test("Runtipi standalone package and app-store package stay identical", () => {
     );
   }
 });
+
+test("Runtipi text fields define valid length limits", () => {
+  const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
+  const stringFields = config.form_fields.filter(({ type }) => type === "text" || type === "password");
+
+  for (const field of stringFields) {
+    assert.equal(Number.isInteger(field.min), true, `${field.env_variable} has no integer min`);
+    assert.equal(Number.isInteger(field.max), true, `${field.env_variable} has no integer max`);
+    assert.equal(field.min <= field.max, true, `${field.env_variable} has invalid length limits`);
+  }
+});
