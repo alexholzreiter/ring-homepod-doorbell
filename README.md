@@ -80,6 +80,11 @@ Die App verwendet das Image
 `.github/workflows/container.yml` veröffentlicht es für `amd64` und `arm64`,
 sobald das Git-Tag `v0.2.9` gepusht wird.
 
+Bei jedem App-Release muss zusätzlich `tipi_version` in beiden Runtipi-
+`config.json`-Dateien erhöht werden. Runtipi verwendet diesen ganzzahligen
+Revisionszähler, um installierten Apps ein Update anzubieten und deren
+angezeigte Version zu aktualisieren.
+
 Nach der ersten Veröffentlichung muss das Container-Paket auf GitHub öffentlich
 sichtbar sein, damit Runtipi es ohne Registry-Anmeldung laden kann.
 

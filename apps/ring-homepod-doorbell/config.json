@@ -7,7 +7,7 @@
   "port": 8585,
   "categories": ["automation", "utilities"],
   "description": "Lokale Ring-zu-AirPlay-Bridge mit eigenem Klingelton und optionalem HomeKit-Gong.",
-  "tipi_version": 2,
+  "tipi_version": 9,
   "version": "0.2.9",
   "source": "https://github.com/alexholzreiter/ring-homepod-doorbell",
   "exposable": false,
