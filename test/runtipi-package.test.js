@@ -35,3 +35,9 @@ test("Runtipi text fields define valid length limits", () => {
     assert.equal(field.min <= field.max, true, `${field.env_variable} has invalid length limits`);
   }
 });
+
+test("Runtipi compose does not depend on unavailable UID variables", () => {
+  const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
+
+  assert.doesNotMatch(compose, /\$\{(?:UID|GID)\}/);
+});
