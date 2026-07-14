@@ -47,9 +47,9 @@ test("OwnTone receives a configuration directory instead of a file mount", () =>
   const dockerfile = fs.readFileSync(path.join(root, "Dockerfile"), "utf8");
 
   assert.match(dockerfile, /COPY owntone\.conf \.\/owntone\.conf/);
-  assert.match(compose, /\.\/owntone\.conf:\/tmp\/ring-homepod-owntone\.conf:ro/);
   assert.match(compose, /owntone-config:\/etc\/owntone:ro/);
   assert.doesNotMatch(compose, /:\/etc\/owntone\/owntone\.conf/);
+  assert.doesNotMatch(compose, /\.\/owntone\.conf:/);
 });
 
 test("Runtipi compose contains only long-running services", () => {
@@ -57,7 +57,7 @@ test("Runtipi compose contains only long-running services", () => {
 
   assert.doesNotMatch(compose, /^  prepare:/m);
   assert.doesNotMatch(compose, /service_completed_successfully/);
-  assert.match(compose, /cp \/tmp\/ring-homepod-owntone\.conf \/data\/owntone-config\/owntone\.conf/);
+  assert.match(compose, /cat > \/data\/owntone-config\/owntone\.conf/);
 });
 
 test("OwnTone process is supervised and automatically respawned", () => {

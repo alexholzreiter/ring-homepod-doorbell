@@ -36,7 +36,30 @@ services:
       - -c
       - |
         mkdir -p /data/media /data/owntone-cache /data/owntone-config
-        cp /tmp/ring-homepod-owntone.conf /data/owntone-config/owntone.conf
+        cat > /data/owntone-config/owntone.conf <<'OWNTONE_CONFIG'
+        general {
+          uid = "owntone"
+          logfile = "/dev/stdout"
+          loglevel = log
+          trusted_networks = { "localhost" }
+          ipv6 = no
+          cache_dir = "/var/cache/owntone"
+          speaker_autoselect = no
+          start_buffer_ms = 1000
+        }
+        library {
+          name = "Ring HomePod Doorbell"
+          port = 3689
+          directories = { "/srv/media" }
+        }
+        audio {
+          nickname = "Disabled"
+          type = "disabled"
+        }
+        mpd {
+          port = 0
+        }
+        OWNTONE_CONFIG
         chmod 0644 /data/owntone-config/owntone.conf
         chown -R "$${UID}:$${GID}" /data/media /data/owntone-cache /data/owntone-config
         sed -i 's|^command_args=.*|command_args="-f"|' /etc/init.d/owntone
@@ -49,7 +72,6 @@ services:
       GID: ${PGID:-1000}
     volumes:
       - ./data:/data
-      - ./owntone.conf:/tmp/ring-homepod-owntone.conf:ro
       - ./data/owntone-config:/etc/owntone:ro
       - ./data/media:/srv/media
       - ./data/owntone-cache:/var/cache/owntone
