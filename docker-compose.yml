@@ -1,0 +1,19 @@
+services:
+  ring-homepod-doorbell:
+    build:
+      context: .
+    container_name: ring-homepod-doorbell
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: Europe/Vienna
+      DATA_DIR: /data
+      WEB_PORT: "8585"
+      HOMEKIT_PORT: "47129"
+      HOMEKIT_PIN: "${HOMEKIT_PIN:-031-45-154}"
+      HOMEKIT_USERNAME: "${HOMEKIT_USERNAME:-12:34:56:78:90:AB}"
+      DEVICE_NAME: "${DEVICE_NAME:-Ring Haustür}"
+      RING_CAMERA_NAME: "${RING_CAMERA_NAME:-}"
+      RING_REFRESH_TOKEN: "${RING_REFRESH_TOKEN}"
+    volumes:
+      - ./data:/data

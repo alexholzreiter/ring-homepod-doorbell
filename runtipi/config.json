@@ -1,0 +1,58 @@
+{
+  "name": "Ring HomePod Doorbell",
+  "id": "ring-homepod-doorbell",
+  "available": true,
+  "short_desc": "Spielt über HomeKit einen Türklingelton auf HomePods ab, wenn eine Ring-Türklingel gedrückt wird.",
+  "author": "Alexander Holzreiter",
+  "port": 8585,
+  "categories": ["automation", "utilities"],
+  "description": "Lokale Ring-zu-HomeKit-Türklingel-Bridge für Apple HomePods.",
+  "tipi_version": 1,
+  "version": "0.1.0",
+  "source": "https://github.com/alexholzreiter/ring-homepod-doorbell",
+  "exposable": false,
+  "dynamic_config": true,
+  "supported_architectures": ["amd64", "arm64"],
+  "form_fields": [
+    {
+      "type": "password",
+      "label": "Ring Refresh-Token",
+      "hint": "Mit ring-auth-cli erzeugen.",
+      "required": true,
+      "env_variable": "RING_REFRESH_TOKEN"
+    },
+    {
+      "type": "text",
+      "label": "Name der Ring-Kamera",
+      "hint": "Leer lassen, um die erste Kamera zu verwenden.",
+      "required": false,
+      "env_variable": "RING_CAMERA_NAME"
+    },
+    {
+      "type": "text",
+      "label": "HomeKit-Gerätename",
+      "default": "Ring Haustür",
+      "required": false,
+      "env_variable": "DEVICE_NAME"
+    },
+    {
+      "type": "text",
+      "label": "HomeKit-PIN",
+      "default": "031-45-154",
+      "regex": "^[0-9]{3}-[0-9]{2}-[0-9]{3}$",
+      "pattern_error": "Format muss 031-45-154 entsprechen.",
+      "required": false,
+      "env_variable": "HOMEKIT_PIN"
+    },
+    {
+      "type": "text",
+      "label": "HomeKit Username",
+      "hint": "Eindeutige MAC-ähnliche Kennung.",
+      "default": "12:34:56:78:90:AB",
+      "regex": "^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$",
+      "pattern_error": "Format muss 12:34:56:78:90:AB entsprechen.",
+      "required": false,
+      "env_variable": "HOMEKIT_USERNAME"
+    }
+  ]
+}
