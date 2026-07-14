@@ -5,15 +5,52 @@ services:
     container_name: ring-homepod-doorbell
     restart: unless-stopped
     network_mode: host
+    depends_on:
+      prepare:
+        condition: service_completed_successfully
     environment:
-      TZ: Europe/Vienna
+      TZ: ${TZ:-Europe/Vienna}
       DATA_DIR: /data
+      MEDIA_DIR: /data/media
       WEB_PORT: "8585"
+      OWNTONE_URL: http://127.0.0.1:3689
+      OWNTONE_MEDIA_PATH: /srv/media
+      RING_REFRESH_TOKEN: ${RING_REFRESH_TOKEN:-}
+      RING_CAMERA_NAME: ${RING_CAMERA_NAME:-}
+      DEVICE_NAME: ${DEVICE_NAME:-Ring Haustür}
+      HOMEKIT_ENABLED: ${HOMEKIT_ENABLED:-false}
       HOMEKIT_PORT: "47129"
-      HOMEKIT_PIN: "${HOMEKIT_PIN:-031-45-154}"
-      HOMEKIT_USERNAME: "${HOMEKIT_USERNAME:-12:34:56:78:90:AB}"
-      DEVICE_NAME: "${DEVICE_NAME:-Ring Haustür}"
-      RING_CAMERA_NAME: "${RING_CAMERA_NAME:-}"
-      RING_REFRESH_TOKEN: "${RING_REFRESH_TOKEN}"
+      HOMEKIT_PIN: ${HOMEKIT_PIN:-031-45-154}
+      HOMEKIT_USERNAME: ${HOMEKIT_USERNAME:-12:34:56:78:90:AB}
     volumes:
       - ./data:/data
+
+  prepare:
+    image: docker.io/library/busybox:1.37.0
+    restart: "no"
+    user: "0:0"
+    environment:
+      OWNTONE_UID: ${PUID:-1000}
+      OWNTONE_GID: ${PGID:-1000}
+    command:
+      - sh
+      - -c
+      - mkdir -p /data/media /data/owntone-cache && chown -R "$${OWNTONE_UID}:$${OWNTONE_GID}" /data/media /data/owntone-cache
+    volumes:
+      - ./data:/data
+
+  owntone:
+    image: docker.io/owntone/owntone:29.2
+    container_name: ring-homepod-doorbell-owntone
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      prepare:
+        condition: service_completed_successfully
+    environment:
+      UID: ${PUID:-1000}
+      GID: ${PGID:-1000}
+    volumes:
+      - ./owntone.conf:/etc/owntone/owntone.conf:ro
+      - ./data/media:/srv/media
+      - ./data/owntone-cache:/var/cache/owntone

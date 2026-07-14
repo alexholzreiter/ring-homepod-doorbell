@@ -1,17 +1,19 @@
 {
   "name": "ring-homepod-doorbell",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "Bridges Ring doorbell presses to a HomeKit doorbell event.",
+  "description": "Plays a custom Ring doorbell chime on HomePods via OwnTone/AirPlay.",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "node --test"
   },
   "dependencies": {
     "express": "^5.1.0",
-    "hap-nodejs": "2.1.6",
-    "ring-client-api": "^13.2.0"
+    "@homebridge/hap-nodejs": "^2.1.8",
+    "multer": "^2.0.2",
+    "ring-client-api": "^14.3.0"
   },
   "engines": {
     "node": ">=22"
