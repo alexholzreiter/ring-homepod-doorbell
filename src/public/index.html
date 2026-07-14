@@ -16,19 +16,23 @@
     <div class="ambient ambient-two"></div>
 
     <div class="app-shell">
-      <nav class="topbar" aria-label="Hauptnavigation">
-        <a class="brand" href="/" aria-label="HomePod Doorbell Startseite">
+      <nav class="topbar" aria-label="Hauptnavigation" data-i18n-aria-label="mainNavigation">
+        <a class="brand" href="/" aria-label="HomePod Doorbell Startseite" data-i18n-aria-label="homeLink">
           <span class="brand-mark">
             <img src="/DoorHomePodBell_logo.png" alt="">
           </span>
           <span><strong>Doorbell</strong><small>Ring × HomePod</small></span>
         </a>
         <div class="topbar-actions">
+          <div class="language-switcher" role="group" aria-label="Sprache auswählen" data-i18n-aria-label="languageSwitcher">
+            <button type="button" data-language="de" aria-label="Deutsch">DE</button>
+            <button type="button" data-language="en" aria-label="English">EN</button>
+          </div>
           <span class="privacy-chip">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.5 7 10 4.2-1.5 7-5.5 7-10V6l-7-3Z"/><path d="m9.5 12 1.7 1.7 3.6-4"/></svg>
-            Nur lokal
+            <span data-i18n="localOnly">Nur lokal</span>
           </span>
-          <button id="refresh" class="icon-button" type="button" aria-label="Geräte neu suchen" title="Geräte neu suchen">
+          <button id="refresh" class="icon-button" type="button" aria-label="Geräte neu suchen" title="Geräte neu suchen" data-i18n-aria-label="refreshDevices" data-i18n-title="refreshDevices">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>
           </button>
         </div>
@@ -38,28 +42,28 @@
 
       <header class="hero">
         <div class="hero-copy">
-          <span class="hero-label"><i></i> Bereit für deinen Besuch</span>
-          <h1>Deine Klingel.<br><em>Dein Sound.</em></h1>
-          <p>Wenn es an der Ring Doorbell klingelt, hören es alle ausgewählten HomePods – mit genau dem Ton, den du möchtest.</p>
+          <span class="hero-label"><i></i> <span data-i18n="heroLabel">Bereit für deinen Besuch</span></span>
+          <h1><span data-i18n="heroTitle">Deine Klingel.</span><br><em data-i18n="heroAccent">Dein Sound.</em></h1>
+          <p data-i18n="heroDescription">Wenn es an der Ring Doorbell klingelt, hören es alle ausgewählten HomePods – mit genau dem Ton, den du möchtest.</p>
           <div class="hero-actions">
             <button id="test-ring" class="button button-primary" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z"/></svg>
-              Klingelton testen
+              <span data-i18n="testChime">Klingelton testen</span>
             </button>
-            <a class="button button-ghost" href="#setup">Einrichtung öffnen</a>
+            <a class="button button-ghost" href="#setup" data-i18n="openSetup">Einrichtung öffnen</a>
           </div>
-          <div class="connection-strip" aria-label="Verbindungsstatus">
+          <div class="connection-strip" aria-label="Verbindungsstatus" data-i18n-aria-label="connectionStatus">
             <div class="connection-item">
               <span id="ring-dot" class="dot"></span>
-              <span><small>Ring</small><strong id="ring-status">Wird geprüft …</strong></span>
+              <span><small>Ring</small><strong id="ring-status" data-i18n="checking">Wird geprüft …</strong></span>
             </div>
             <div class="connection-item">
               <span id="airplay-dot" class="dot"></span>
-              <span><small>AirPlay</small><strong id="airplay-status">Wird geprüft …</strong></span>
+              <span><small>AirPlay</small><strong id="airplay-status" data-i18n="checking">Wird geprüft …</strong></span>
             </div>
             <div class="connection-item">
               <span id="chime-dot" class="dot"></span>
-              <span><small>Sound</small><strong id="chime-status">Nicht gewählt</strong></span>
+              <span><small>Sound</small><strong id="chime-status" data-i18n="notSelected">Nicht gewählt</strong></span>
             </div>
           </div>
         </div>
@@ -88,12 +92,12 @@
         <div class="main-column">
           <section class="section-heading">
             <div>
-              <span class="section-kicker">EINRICHTUNG</span>
-              <h2>In drei Schritten startklar</h2>
+              <span class="section-kicker" data-i18n="setupKicker">EINRICHTUNG</span>
+              <h2 data-i18n="setupTitle">In drei Schritten startklar</h2>
             </div>
             <span class="autosave-note">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-              Lokal gespeichert
+              <span data-i18n="savedLocally">Lokal gespeichert</span>
             </span>
           </section>
 
@@ -101,7 +105,7 @@
             <div class="step-badge">01</div>
             <div class="card-content">
               <div class="card-heading">
-                <div><h3>Klingelton auswählen</h3><p>Lade deinen persönlichen Sound hoch.</p></div>
+                <div><h3 data-i18n="chooseChime">Klingelton auswählen</h3><p data-i18n="chooseChimeDescription">Lade deinen persönlichen Sound hoch.</p></div>
                 <span class="format-chip">Audio · max. 15 MB</span>
               </div>
               <form id="upload-form" class="upload-area">
@@ -110,9 +114,9 @@
                   <span class="upload-icon">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>
                   </span>
-                  <span class="drop-copy"><strong id="file-label">Audiodatei auswählen</strong><small>MP3, WAV, M4A, AAC, FLAC oder OGG</small></span>
+                  <span class="drop-copy"><strong id="file-label" data-i18n="chooseAudioFile">Audiodatei auswählen</strong><small data-i18n="audioFormats">MP3, WAV, M4A, AAC, FLAC oder OGG</small></span>
                 </label>
-                <button type="submit" class="button button-dark">Hochladen</button>
+                <button type="submit" class="button button-dark" data-i18n="upload">Hochladen</button>
                 <audio id="chime-player" class="hidden audio-player" controls preload="none"></audio>
               </form>
             </div>
@@ -122,19 +126,19 @@
             <div class="step-badge violet">02</div>
             <div class="card-content">
               <div class="card-heading">
-                <div><h3>HomePods auswählen</h3><p>Bestimme, wo der Klingelton abgespielt wird.</p></div>
+                <div><h3 data-i18n="chooseHomePods">HomePods auswählen</h3><p data-i18n="chooseHomePodsDescription">Bestimme, wo der Klingelton abgespielt wird.</p></div>
               </div>
               <label class="select-all-row">
                 <span class="select-all-icon">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5a7 7 0 0 1 14 0v7a3.5 3.5 0 0 1-7 0v-7M8.5 15.5a3.5 3.5 0 0 0 7 0"/></svg>
                 </span>
-                <span class="select-all-copy"><strong>Alle AirPlay-Lautsprecher</strong><small>Neue HomePods automatisch einbeziehen</small></span>
+                <span class="select-all-copy"><strong data-i18n="allAirPlaySpeakers">Alle AirPlay-Lautsprecher</strong><small data-i18n="includeNewHomePods">Neue HomePods automatisch einbeziehen</small></span>
                 <span class="switch"><input id="use-all" type="checkbox"><i></i></span>
               </label>
-              <div id="outputs" class="outputs"><p class="empty">Suche im lokalen Netzwerk …</p></div>
+              <div id="outputs" class="outputs"><p class="empty" data-i18n="searchingNetwork">Suche im lokalen Netzwerk …</p></div>
               <p class="helper-text">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-                Kein HomePod sichtbar? Erlaube in Apple Home unter „Lautsprecher &amp; TV“ den Zugriff für alle im selben Netzwerk.
+                <span data-i18n="homePodHelp">Kein HomePod sichtbar? Erlaube in Apple Home unter „Lautsprecher &amp; TV“ den Zugriff für alle im selben Netzwerk.</span>
               </p>
             </div>
           </section>
@@ -143,24 +147,24 @@
             <div class="step-badge blue">03</div>
             <div class="card-content">
               <div class="card-heading">
-                <div><h3>Wiedergabe einstellen</h3><p>So laut und so oft, wie es für dein Zuhause passt.</p></div>
+                <div><h3 data-i18n="playbackSettings">Wiedergabe einstellen</h3><p data-i18n="playbackSettingsDescription">So laut und so oft, wie es für dein Zuhause passt.</p></div>
               </div>
               <div class="control-grid">
                 <label class="range-control">
-                  <span class="control-title"><strong>Lautstärke</strong><output id="volume-value">60 %</output></span>
+                  <span class="control-title"><strong data-i18n="volume">Lautstärke</strong><output id="volume-value">60 %</output></span>
                   <input id="volume" type="range" min="1" max="100" value="60">
-                  <span class="range-labels"><small>Leise</small><small>Laut</small></span>
+                  <span class="range-labels"><small data-i18n="quiet">Leise</small><small data-i18n="loud">Laut</small></span>
                 </label>
                 <label class="cooldown-control">
-                  <span class="control-title"><strong>Doppeltes Klingeln vermeiden</strong><small>Sperrzeit</small></span>
-                  <span class="number-field"><input id="cooldown" type="number" min="1" max="60" value="5"><span>Sek.</span></span>
+                  <span class="control-title"><strong data-i18n="avoidDuplicateRings">Doppeltes Klingeln vermeiden</strong><small data-i18n="cooldown">Sperrzeit</small></span>
+                  <span class="number-field"><input id="cooldown" type="number" min="1" max="60" value="5"><span data-i18n="secondsShort">Sek.</span></span>
                 </label>
               </div>
               <div class="save-row">
-                <span>Änderungen werden auf deinem Server gespeichert.</span>
+                <span data-i18n="changesSavedOnServer">Änderungen werden auf deinem Server gespeichert.</span>
                 <button id="save" class="button button-dark" type="button">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l2 2v14H5V4Z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>
-                  Einstellungen speichern
+                  <span data-i18n="saveSettings">Einstellungen speichern</span>
                 </button>
               </div>
             </div>
@@ -169,37 +173,37 @@
 
         <aside class="side-column">
           <section class="card now-card">
-            <div class="live-heading"><span><i></i> LIVE-STATUS</span><small id="camera">–</small></div>
+            <div class="live-heading"><span><i></i> <span data-i18n="liveStatus">LIVE-STATUS</span></span><small id="camera">–</small></div>
             <div class="now-illustration">
               <div class="live-logo"><img src="/DoorHomePodBell_logo.png" alt=""></div>
               <div class="signal-wave wave-a"></div>
               <div class="signal-wave wave-b"></div>
             </div>
-            <h3>Alles im Blick.</h3>
-            <p>Die Bridge wartet auf das nächste Klingelereignis deiner Ring Doorbell.</p>
+            <h3 data-i18n="everythingAtAGlance">Alles im Blick.</h3>
+            <p data-i18n="waitingForRing">Die Bridge wartet auf das nächste Klingelereignis deiner Ring Doorbell.</p>
             <div class="last-event">
               <span class="event-icon"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></span>
-              <span><small>Letztes Klingeln</small><strong id="last-ring">–</strong></span>
+              <span><small data-i18n="lastRing">Letztes Klingeln</small><strong id="last-ring">–</strong></span>
             </div>
           </section>
 
           <section class="card activity-card">
-            <div class="aside-heading"><h3>Systemdetails</h3><span class="detail-dot"></span></div>
+            <div class="aside-heading"><h3 data-i18n="systemDetails">Systemdetails</h3><span class="detail-dot"></span></div>
             <dl>
-              <div><dt><span class="detail-icon purple"><svg viewBox="0 0 24 24"><path d="M6 19V5M6 8h8a4 4 0 0 1 0 8H6"/></svg></span>Letzte Wiedergabe</dt><dd id="last-playback">–</dd></div>
-              <div><dt><span class="detail-icon orange"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>Bridge gestartet</dt><dd>Aktiv</dd></div>
-              <div><dt><span class="detail-icon green"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>Letzter Fehler</dt><dd id="last-error">–</dd></div>
+              <div><dt><span class="detail-icon purple"><svg viewBox="0 0 24 24"><path d="M6 19V5M6 8h8a4 4 0 0 1 0 8H6"/></svg></span><span data-i18n="lastPlayback">Letzte Wiedergabe</span></dt><dd id="last-playback">–</dd></div>
+              <div><dt><span class="detail-icon orange"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span><span data-i18n="bridgeStarted">Bridge gestartet</span></dt><dd data-i18n="active">Aktiv</dd></div>
+              <div><dt><span class="detail-icon green"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span data-i18n="lastError">Letzter Fehler</span></dt><dd id="last-error">–</dd></div>
             </dl>
           </section>
 
           <section class="support-card">
             <span class="support-icon"><svg viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0-9-9v5a2 2 0 0 0 2 2h2v-7H3M21 12v5a2 2 0 0 1-2 2h-2v-7h4M12 21h3"/></svg></span>
-            <span><strong>Brauchst du Hilfe?</strong><small>Prüfe Ring-Token und Netzwerkzugriff.</small></span>
+            <span><strong data-i18n="needHelp">Brauchst du Hilfe?</strong><small data-i18n="helpDescription">Prüfe Ring-Token und Netzwerkzugriff.</small></span>
           </section>
         </aside>
       </main>
 
-      <footer><span>Ring HomePod Doorbell</span><span>Private Smart-Home-Bridge · lokal betrieben</span></footer>
+      <footer><span>Ring HomePod Doorbell</span><span data-i18n="footerDescription">Private Smart-Home-Bridge · lokal betrieben</span></footer>
     </div>
   </body>
 </html>

@@ -1,6 +1,8 @@
 import { chooseVisibleOutputs, shouldApplyServerForm } from "./ui-state.js";
+import { localizeServerMessage, resolveLanguage, translate } from "./i18n.js";
 
 const $ = (selector) => document.querySelector(selector);
+const LANGUAGE_STORAGE_KEY = "ring-homepod-doorbell-language";
 const elements = {
   airplayDot: $("#airplay-dot"),
   airplayStatus: $("#airplay-status"),
@@ -14,6 +16,7 @@ const elements = {
   lastError: $("#last-error"),
   lastPlayback: $("#last-playback"),
   lastRing: $("#last-ring"),
+  languageButtons: [...document.querySelectorAll("[data-language]")],
   notice: $("#notice"),
   outputs: $("#outputs"),
   refresh: $("#refresh"),
@@ -31,6 +34,50 @@ let current;
 let noticeTimer;
 let formDirty = false;
 let lastKnownOutputs = [];
+let language = resolveLanguage(
+  window.localStorage.getItem(LANGUAGE_STORAGE_KEY),
+  navigator.languages ?? [navigator.language]
+);
+
+const t = (key, values) => translate(language, key, values);
+
+function applyTranslations() {
+  document.documentElement.lang = language;
+  document.title = t("documentTitle");
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+    element.title = t(element.dataset.i18nTitle);
+  });
+  elements.languageButtons.forEach((button) => {
+    const active = button.dataset.language === language;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function selectedOutputIds() {
+  return [...document.querySelectorAll(".output-checkbox:checked")].map((item) => item.value);
+}
+
+function changeLanguage(nextLanguage) {
+  language = resolveLanguage(nextLanguage);
+  window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  clearNotice();
+  applyTranslations();
+  if (!current) return;
+  renderStatus(current);
+  const visibleOutputs = chooseVisibleOutputs(current.outputs, lastKnownOutputs);
+  const displaySettings = formDirty
+    ? { ...current.settings, selectedOutputIds: selectedOutputIds(), useAllOutputs: elements.useAll.checked }
+    : current.settings;
+  renderOutputs(visibleOutputs, displaySettings);
+  if (!elements.chimeFile.files.length) elements.fileLabel.textContent = t("chooseAudioFile");
+}
 
 function markFormDirty() {
   formDirty = true;
@@ -42,12 +89,13 @@ function setConnection(dot, label, connected, goodText, badText) {
 }
 
 function formatDate(value) {
-  return value ? new Intl.DateTimeFormat("de-AT", { dateStyle: "short", timeStyle: "medium" }).format(new Date(value)) : "–";
+  const locale = language === "de" ? "de-AT" : "en-GB";
+  return value ? new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "medium" }).format(new Date(value)) : "–";
 }
 
 function showNotice(message, success = false) {
   window.clearTimeout(noticeTimer);
-  elements.notice.textContent = message;
+  elements.notice.textContent = localizeServerMessage(language, message);
   elements.notice.className = `notice${success ? " success" : ""}`;
   noticeTimer = window.setTimeout(clearNotice, success ? 4000 : 7000);
 }
@@ -69,7 +117,7 @@ function renderOutputs(outputs, settings) {
   if (!outputs.length) {
     const empty = document.createElement("p");
     empty.className = "empty";
-    empty.textContent = "Keine AirPlay-Lautsprecher gefunden.";
+    empty.textContent = t("noOutputs");
     elements.outputs.append(empty);
     return;
   }
@@ -92,7 +140,7 @@ function renderOutputs(outputs, settings) {
     const name = document.createElement("strong");
     name.textContent = output.name;
     const detail = document.createElement("small");
-    detail.textContent = `AirPlay · ${output.volume} % Lautstärke`;
+    detail.textContent = t("outputVolume", { volume: output.volume });
     text.append(name, detail);
     const check = document.createElement("span");
     check.className = "output-check";
@@ -102,11 +150,33 @@ function renderOutputs(outputs, settings) {
     if (output.needs_auth_key || output.requires_auth) {
       const auth = document.createElement("small");
       auth.className = "auth-badge";
-      auth.textContent = "Freigabe nötig";
+      auth.textContent = t("authRequired");
       row.append(auth);
     }
     elements.outputs.append(row);
   }
+}
+
+function renderStatus(data) {
+  setConnection(elements.ringDot, elements.ringStatus, data.ringConnected, t("connected"), t("notConnected"));
+  setConnection(
+    elements.airplayDot,
+    elements.airplayStatus,
+    data.ownToneConnected,
+    t("foundOutputs", { count: data.outputs.length }),
+    t("notReachable")
+  );
+  setConnection(
+    elements.chimeDot,
+    elements.chimeStatus,
+    Boolean(data.settings.chimeFilename),
+    data.settings.chimeFilename || t("chimeReady"),
+    t("notSelected")
+  );
+  elements.camera.textContent = data.ringCamera || "–";
+  elements.lastRing.textContent = formatDate(data.lastRingAt);
+  elements.lastPlayback.textContent = formatDate(data.lastPlaybackAt);
+  elements.lastError.textContent = localizeServerMessage(language, data.lastError || "–");
 }
 
 async function loadStatus({ forceForm = false, quiet = false } = {}) {
@@ -115,13 +185,7 @@ async function loadStatus({ forceForm = false, quiet = false } = {}) {
     current = data;
     if (data.outputs.length) lastKnownOutputs = data.outputs;
     const visibleOutputs = chooseVisibleOutputs(data.outputs, lastKnownOutputs);
-    setConnection(elements.ringDot, elements.ringStatus, data.ringConnected, "Verbunden", "Nicht verbunden");
-    setConnection(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, `${data.outputs.length} gefunden`, "Nicht erreichbar");
-    setConnection(elements.chimeDot, elements.chimeStatus, Boolean(data.settings.chimeFilename), data.settings.chimeFilename || "Bereit", "Nicht gewählt");
-    elements.camera.textContent = data.ringCamera || "–";
-    elements.lastRing.textContent = formatDate(data.lastRingAt);
-    elements.lastPlayback.textContent = formatDate(data.lastPlaybackAt);
-    elements.lastError.textContent = data.lastError || "–";
+    renderStatus(data);
     if (shouldApplyServerForm({ dirty: formDirty, force: forceForm })) {
       elements.useAll.checked = data.settings.useAllOutputs;
       elements.volume.value = data.settings.volume;
@@ -135,7 +199,7 @@ async function loadStatus({ forceForm = false, quiet = false } = {}) {
       elements.chimePlayer.classList.remove("hidden");
     }
   } catch (error) {
-    showNotice(`Status konnte nicht geladen werden: ${error.message}`);
+    showNotice(t("statusLoadFailed", { message: error.message }));
   }
 }
 
@@ -146,7 +210,7 @@ elements.volume.addEventListener("input", () => {
 });
 
 elements.chimeFile.addEventListener("change", () => {
-  elements.fileLabel.textContent = elements.chimeFile.files[0]?.name || "Audiodatei auswählen";
+  elements.fileLabel.textContent = elements.chimeFile.files[0]?.name || t("chooseAudioFile");
 });
 
 elements.useAll.addEventListener("change", () => {
@@ -169,9 +233,9 @@ elements.uploadForm.addEventListener("submit", async (event) => {
   button.disabled = true;
   try {
     await api("/api/chime", { method: "POST", body: new FormData(elements.uploadForm) });
-    showNotice("Klingelton wurde hochgeladen und von OwnTone erkannt.", true);
+    showNotice(t("chimeUploaded"), true);
     elements.uploadForm.reset();
-    elements.fileLabel.textContent = "Audiodatei auswählen";
+    elements.fileLabel.textContent = t("chooseAudioFile");
     await loadStatus({ quiet: true });
   } catch (error) {
     showNotice(error.message);
@@ -184,19 +248,19 @@ elements.save.addEventListener("click", async () => {
   clearNotice();
   elements.save.disabled = true;
   try {
-    const selectedOutputIds = [...document.querySelectorAll(".output-checkbox:checked")].map((item) => item.value);
+    const outputIds = selectedOutputIds();
     const result = await api("/api/settings", {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         cooldownSeconds: Number(elements.cooldown.value),
-        selectedOutputIds,
+        selectedOutputIds: outputIds,
         useAllOutputs: elements.useAll.checked,
         volume: Number(elements.volume.value),
       }),
     });
     formDirty = false;
-    showNotice(result.warning || "Einstellungen und Gerätelautstärke gespeichert.", !result.warning);
+    showNotice(result.warning || t("settingsSaved"), !result.warning);
     await loadStatus({ forceForm: true, quiet: true });
   } catch (error) {
     showNotice(error.message);
@@ -210,7 +274,7 @@ elements.test.addEventListener("click", async () => {
   elements.test.disabled = true;
   try {
     await api("/api/test-ring", { method: "POST" });
-    showNotice("Testklingeln wurde erfolgreich abgespielt.", true);
+    showNotice(t("testSucceeded"), true);
     await loadStatus({ quiet: true });
   } catch (error) {
     showNotice(error.message);
@@ -220,5 +284,9 @@ elements.test.addEventListener("click", async () => {
 });
 
 elements.refresh.addEventListener("click", () => loadStatus());
+elements.languageButtons.forEach((button) => {
+  button.addEventListener("click", () => changeLanguage(button.dataset.language));
+});
+applyTranslations();
 await loadStatus();
 setInterval(() => loadStatus({ quiet: true }), 15000);

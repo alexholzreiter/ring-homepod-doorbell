@@ -1,20 +1,18 @@
 # Ring HomePod Doorbell
 
-Diese App erkennt den Tastendruck einer Ring-Türklingel und spielt eine eigene
-Audiodatei synchron auf ausgewählten HomePods oder anderen AirPlay-Lautsprechern
-ab. Der Klingelton, die Lautsprecher, Lautstärke und Sperrzeit werden bequem in
-der Weboberfläche festgelegt.
+This app detects presses of a Ring Doorbell and plays a custom audio file in
+sync on selected HomePods or other AirPlay speakers. The chime, speakers,
+volume, and cooldown are configured in the web interface.
 
-## Vor dem ersten Test
+## Before your first test
 
-1. In Apple Home unter **Einstellungen des Zuhauses → Lautsprecher & TV** den
-   Zugriff für **Alle im selben Netzwerk** erlauben.
-2. Einen Klingelton in der App hochladen.
-3. Die erkannten HomePods auswählen und **Klingelton testen** drücken.
+1. In Apple Home, open **Home Settings → Speakers & TV** and allow access for
+   **Anyone On the Same Network**.
+2. Upload a chime in the app.
+3. Select the detected HomePods and press **Test chime**.
 
-Die App verwendet Host-Networking für AirPlay/mDNS. Sie sollte deshalb nur im
-vertrauenswürdigen Heimnetz betrieben und nicht ins Internet freigegeben werden.
+The app uses host networking for AirPlay/mDNS. Only run it on a trusted home
+network and do not expose it directly to the internet.
 
-Optional kann zusätzlich eine virtuelle HomeKit-Türklingel aktiviert werden.
-Diese erzeugt Apples normalen HomePod-Gong und ist für den eigenen Ton nicht
-erforderlich.
+You can optionally enable a virtual HomeKit doorbell. It produces Apple's
+standard HomePod chime and is not required for custom sound playback.

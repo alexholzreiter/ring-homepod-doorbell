@@ -9,7 +9,8 @@ Ring-Tastendruck → eigener Klingelton → ausgewählte HomePods
 Die App empfängt das Klingelereignis über `ring-client-api`. Ein eigener
 OwnTone-Dienst spielt die hochgeladene Audiodatei synchron auf mehreren
 AirPlay-Lautsprechern ab. Die Weboberfläche verwaltet Klingelton, HomePods,
-Lautstärke und eine Sperrzeit gegen doppelte Ring-Ereignisse.
+Lautstärke und eine Sperrzeit gegen doppelte Ring-Ereignisse. Sie kann dauerhaft
+zwischen Deutsch und Englisch umgeschaltet werden.
 
 ## Voraussetzungen
 
@@ -76,9 +77,9 @@ Das Verzeichnis `runtipi/` enthält zusätzlich dieselbe Appdefinition als
 einzeln kopierbares Paket.
 
 Die App verwendet das Image
-`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.10`. Der Workflow
+`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.11`. Der Workflow
 `.github/workflows/container.yml` veröffentlicht es für `amd64` und `arm64`,
-sobald das Git-Tag `v0.2.10` gepusht wird.
+sobald das Git-Tag `v0.2.11` gepusht wird.
 
 Bei jedem App-Release muss zusätzlich `tipi_version` in beiden Runtipi-
 `config.json`-Dateien erhöht werden. Runtipi verwendet diesen ganzzahligen

@@ -1,6 +1,6 @@
 {
   "name": "ring-homepod-doorbell",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "private": true,
   "type": "module",
   "description": "Plays a custom Ring doorbell chime on HomePods via OwnTone/AirPlay.",
