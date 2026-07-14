@@ -10,6 +10,7 @@ const packagedFiles = [
   "config.json",
   "docker-compose.yml",
   "owntone.conf",
+  "owntone-supervise.conf",
   "metadata/description.md",
   "metadata/logo.jpg",
   "metadata/logo.svg",
@@ -49,4 +50,13 @@ test("OwnTone receives a configuration directory instead of a file mount", () =>
   assert.match(dockerfile, /COPY owntone\.conf \.\/owntone\.conf/);
   assert.match(compose, /owntone-config:\/etc\/owntone:ro/);
   assert.doesNotMatch(compose, /:\/etc\/owntone\/owntone\.conf/);
+});
+
+test("OwnTone process is supervised and automatically respawned", () => {
+  const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
+  const supervision = fs.readFileSync(path.join(storeApp, "owntone-supervise.conf"), "utf8");
+
+  assert.match(compose, /owntone-supervise\.conf:\/etc\/conf\.d\/owntone:ro/);
+  assert.match(supervision, /supervisor="supervise-daemon"/);
+  assert.match(supervision, /respawn_max=0/);
 });

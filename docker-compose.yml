@@ -52,6 +52,7 @@ services:
       UID: ${PUID:-1000}
       GID: ${PGID:-1000}
     volumes:
+      - ./owntone-supervise.conf:/etc/conf.d/owntone:ro
       - ./data/owntone-config:/etc/owntone:ro
       - ./data/media:/srv/media
       - ./data/owntone-cache:/var/cache/owntone

@@ -71,5 +71,27 @@ test("playTrack selects outputs, sets volume and starts a clean queue", async ()
   );
   assert.equal(previous.find((output) => output.id === "old").selected, true);
   assert.ok(calls.some((call) => call.url.endsWith("/api/outputs/set")));
+  assert.ok(calls.some((call) => call.url.endsWith("/api/queue/clear")));
   assert.ok(calls.some((call) => call.url.includes("/api/queue/items/add?") && call.url.includes("playback=start")));
+});
+
+test("stopAndRestore restores volumes sequentially before the selected outputs", async () => {
+  const calls = [];
+  const client = new OwnToneClient("http://owntone", {
+    fetch: async (url, options = {}) => {
+      calls.push({ url, options });
+      return new Response(null, { status: 204 });
+    },
+  });
+
+  await client.stopAndRestore([
+    { id: "one", selected: true, volume: 20 },
+    { id: "two", selected: false, volume: 40 },
+  ]);
+
+  assert.match(calls[0].url, /\/api\/player\/stop$/);
+  assert.match(calls[1].url, /\/api\/outputs\/one$/);
+  assert.match(calls[2].url, /\/api\/outputs\/two$/);
+  assert.match(calls[3].url, /\/api\/outputs\/set$/);
+  assert.deepEqual(JSON.parse(calls[3].options.body), { outputs: ["one"] });
 });

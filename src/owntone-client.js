@@ -97,12 +97,13 @@ export class OwnToneClient {
 
     try {
       await this.setOutputs(outputIds);
-      await Promise.all(
-        outputIds.map((id) => this.configureOutput(id, { selected: true, volume }))
-      );
+      for (const id of outputIds) {
+        await this.configureOutput(id, { selected: true, volume });
+      }
+
+      await this.request("/api/queue/clear", { method: "PUT" });
 
       const query = new URLSearchParams({
-        clear: "true",
         playback: "start",
         shuffle: "false",
         uris: track.uri,
@@ -117,13 +118,10 @@ export class OwnToneClient {
 
   async stopAndRestore(previous) {
     await this.request("/api/player/stop", { method: "PUT" });
-    await Promise.all(
-      previous
-        .filter((output) => Number.isFinite(output.volume))
-        .map((output) =>
-          this.configureOutput(output.id, { volume: output.volume }).catch(() => null)
-        )
-    );
+    await sleep(250);
+    for (const output of previous.filter((item) => Number.isFinite(item.volume))) {
+      await this.configureOutput(output.id, { volume: output.volume }).catch(() => null);
+    }
     await this.setOutputs(previous.filter((output) => output.selected).map((output) => output.id));
   }
 }

@@ -51,6 +51,8 @@ let ringSubscription;
 let accessory;
 let doorbellService;
 let lastAcceptedRing = 0;
+let lastKnownAirPlayOutputs = [];
+let lastOwnToneError = null;
 
 function errorMessage(error) {
   return error instanceof Error ? error.message : String(error);
@@ -109,9 +111,14 @@ async function getOwnToneOutputs() {
   try {
     const outputs = await ownTone.getOutputs();
     state.ownToneConnected = true;
+    if (lastOwnToneError && state.lastError === lastOwnToneError) state.lastError = null;
+    lastOwnToneError = null;
+    const airPlayOutputs = outputs.filter(isAirPlayOutput);
+    if (airPlayOutputs.length) lastKnownAirPlayOutputs = airPlayOutputs;
     return outputs;
   } catch (error) {
     state.ownToneConnected = false;
+    lastOwnToneError = errorMessage(error);
     throw error;
   }
 }
@@ -161,9 +168,11 @@ async function handleDoorbellPress(source) {
   triggerHomeKit();
   try {
     await playCustomChime();
+    return true;
   } catch (error) {
     state.lastError = errorMessage(error);
     console.error("Klingelton konnte nicht abgespielt werden:", error);
+    return false;
   }
 }
 
@@ -221,13 +230,15 @@ app.get("/api/status", async (_req, res) => {
   } catch (error) {
     state.lastError = errorMessage(error);
   }
+  const airPlayOutputs = outputs.filter(isAirPlayOutput);
   res.json({
     ...state,
     deviceName: DEVICE_NAME,
     homekitEnabled: HOMEKIT_ENABLED,
     settings,
     chimeUrl: settings.chimeFilename ? "/api/chime" : null,
-    outputs: outputs.filter(isAirPlayOutput),
+    outputs: airPlayOutputs.length ? airPlayOutputs : lastKnownAirPlayOutputs,
+    outputsStale: !airPlayOutputs.length && lastKnownAirPlayOutputs.length > 0,
   });
 });
 
@@ -288,9 +299,10 @@ app.post("/api/outputs/:id/pair", async (req, res) => {
   }
 });
 
-app.post("/api/test-ring", (_req, res) => {
-  void handleDoorbellPress("web-test");
-  res.status(202).json({ ok: true, triggeredAt: new Date().toISOString() });
+app.post("/api/test-ring", async (_req, res) => {
+  const ok = await handleDoorbellPress("web-test");
+  if (!ok) return res.status(502).json({ error: state.lastError || "Testklingeln fehlgeschlagen." });
+  return res.json({ ok: true, completedAt: new Date().toISOString() });
 });
 
 app.get("/health", (_req, res) => {

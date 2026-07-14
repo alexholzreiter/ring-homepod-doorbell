@@ -1,3 +1,5 @@
+import { chooseVisibleOutputs, shouldApplyServerForm } from "./ui-state.js";
+
 const $ = (selector) => document.querySelector(selector);
 const elements = {
   airplayDot: $("#airplay-dot"),
@@ -27,6 +29,12 @@ const elements = {
 
 let current;
 let noticeTimer;
+let formDirty = false;
+let lastKnownOutputs = [];
+
+function markFormDirty() {
+  formDirty = true;
+}
 
 function setConnection(dot, label, connected, goodText, badText) {
   dot.className = `dot ${connected ? "ok" : "bad"}`;
@@ -101,10 +109,12 @@ function renderOutputs(outputs, settings) {
   }
 }
 
-async function loadStatus({ quiet = false } = {}) {
+async function loadStatus({ forceForm = false, quiet = false } = {}) {
   try {
     const data = await api("/api/status");
     current = data;
+    if (data.outputs.length) lastKnownOutputs = data.outputs;
+    const visibleOutputs = chooseVisibleOutputs(data.outputs, lastKnownOutputs);
     setConnection(elements.ringDot, elements.ringStatus, data.ringConnected, "Verbunden", "Nicht verbunden");
     setConnection(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, `${data.outputs.length} gefunden`, "Nicht erreichbar");
     setConnection(elements.chimeDot, elements.chimeStatus, Boolean(data.settings.chimeFilename), data.settings.chimeFilename || "Bereit", "Nicht gewählt");
@@ -112,12 +122,14 @@ async function loadStatus({ quiet = false } = {}) {
     elements.lastRing.textContent = formatDate(data.lastRingAt);
     elements.lastPlayback.textContent = formatDate(data.lastPlaybackAt);
     elements.lastError.textContent = data.lastError || "–";
-    elements.useAll.checked = data.settings.useAllOutputs;
-    elements.volume.value = data.settings.volume;
-    elements.volumeValue.textContent = `${data.settings.volume} %`;
-    elements.volume.style.background = `linear-gradient(90deg, var(--blue) 0 ${data.settings.volume}%, #e2e7ec ${data.settings.volume}% 100%)`;
-    elements.cooldown.value = data.settings.cooldownSeconds;
-    renderOutputs(data.outputs, data.settings);
+    if (shouldApplyServerForm({ dirty: formDirty, force: forceForm })) {
+      elements.useAll.checked = data.settings.useAllOutputs;
+      elements.volume.value = data.settings.volume;
+      elements.volumeValue.textContent = `${data.settings.volume} %`;
+      elements.volume.style.background = `linear-gradient(90deg, var(--blue) 0 ${data.settings.volume}%, #e2e7ec ${data.settings.volume}% 100%)`;
+      elements.cooldown.value = data.settings.cooldownSeconds;
+      renderOutputs(visibleOutputs, data.settings);
+    }
     if (data.chimeUrl) {
       elements.chimePlayer.src = `${data.chimeUrl}?v=${encodeURIComponent(data.settings.chimeFilename)}`;
       elements.chimePlayer.classList.remove("hidden");
@@ -128,6 +140,7 @@ async function loadStatus({ quiet = false } = {}) {
 }
 
 elements.volume.addEventListener("input", () => {
+  markFormDirty();
   elements.volumeValue.textContent = `${elements.volume.value} %`;
   elements.volume.style.background = `linear-gradient(90deg, var(--blue) 0 ${elements.volume.value}%, #e2e7ec ${elements.volume.value}% 100%)`;
 });
@@ -137,10 +150,16 @@ elements.chimeFile.addEventListener("change", () => {
 });
 
 elements.useAll.addEventListener("change", () => {
+  markFormDirty();
   document.querySelectorAll(".output-checkbox").forEach((checkbox) => {
     checkbox.disabled = elements.useAll.checked;
     if (elements.useAll.checked) checkbox.checked = true;
   });
+});
+
+elements.cooldown.addEventListener("input", markFormDirty);
+elements.outputs.addEventListener("change", (event) => {
+  if (event.target.matches(".output-checkbox")) markFormDirty();
 });
 
 elements.uploadForm.addEventListener("submit", async (event) => {
@@ -176,8 +195,9 @@ elements.save.addEventListener("click", async () => {
         volume: Number(elements.volume.value),
       }),
     });
+    formDirty = false;
     showNotice("Einstellungen gespeichert.", true);
-    await loadStatus({ quiet: true });
+    await loadStatus({ forceForm: true, quiet: true });
   } catch (error) {
     showNotice(error.message);
   } finally {
@@ -190,8 +210,8 @@ elements.test.addEventListener("click", async () => {
   elements.test.disabled = true;
   try {
     await api("/api/test-ring", { method: "POST" });
-    showNotice("Testklingeln wurde ausgelöst.", true);
-    setTimeout(() => loadStatus({ quiet: true }), 1200);
+    showNotice("Testklingeln wurde erfolgreich abgespielt.", true);
+    await loadStatus({ quiet: true });
   } catch (error) {
     showNotice(error.message);
   } finally {
