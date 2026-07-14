@@ -1,11 +1,11 @@
 services:
   ring-homepod-doorbell:
-    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.7
+    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.8
     restart: unless-stopped
     network_mode: host
     depends_on:
-      prepare:
-        condition: service_completed_successfully
+      owntone:
+        condition: service_started
     environment:
       TZ: ${TZ}
       DATA_DIR: /data
@@ -26,17 +26,6 @@ services:
       is_main: true
       internal_port: 8585
 
-  prepare:
-    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.7
-    restart: "no"
-    user: "0:0"
-    command:
-      - sh
-      - -c
-      - mkdir -p /data/media /data/owntone-cache /data/owntone-config && cp /app/owntone.conf /data/owntone-config/owntone.conf && chmod 0644 /data/owntone-config/owntone.conf && chown -R 1000:1000 /data/media /data/owntone-cache /data/owntone-config
-    volumes:
-      - ${APP_DATA_DIR}/data:/data
-
   owntone:
     image: docker.io/owntone/owntone:29.2
     restart: unless-stopped
@@ -45,18 +34,21 @@ services:
       - /bin/sh
       - -c
       - |
+        mkdir -p /data/media /data/owntone-cache /data/owntone-config
+        cp /tmp/ring-homepod-owntone.conf /data/owntone-config/owntone.conf
+        chmod 0644 /data/owntone-config/owntone.conf
+        chown -R 1000:1000 /data/media /data/owntone-cache /data/owntone-config
         sed -i 's|^command_args=.*|command_args="-f"|' /etc/init.d/owntone
         sed -i '/^command=/a supervisor="supervise-daemon"' /etc/init.d/owntone
         sed -i '/^command=/a respawn_delay=3' /etc/init.d/owntone
         sed -i '/^command=/a respawn_max=0' /etc/init.d/owntone
         exec /sbin/init
-    depends_on:
-      prepare:
-        condition: service_completed_successfully
     environment:
       UID: "1000"
       GID: "1000"
     volumes:
+      - ${APP_DATA_DIR}/data:/data
+      - ./owntone.conf:/tmp/ring-homepod-owntone.conf:ro
       - ${APP_DATA_DIR}/data/owntone-config:/etc/owntone:ro
       - ${APP_DATA_DIR}/data/media:/srv/media
       - ${APP_DATA_DIR}/data/owntone-cache:/var/cache/owntone
