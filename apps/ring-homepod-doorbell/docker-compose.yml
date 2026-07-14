@@ -1,6 +1,6 @@
 services:
   ring-homepod-doorbell:
-    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.2
+    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.3
     restart: unless-stopped
     network_mode: host
     depends_on:
@@ -27,13 +27,13 @@ services:
       internal_port: 8585
 
   prepare:
-    image: docker.io/library/busybox:1.37.0
+    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.3
     restart: "no"
     user: "0:0"
     command:
       - sh
       - -c
-      - mkdir -p /data/media /data/owntone-cache && chown -R 1000:1000 /data/media /data/owntone-cache
+      - mkdir -p /data/media /data/owntone-cache /data/owntone-config && cp /app/owntone.conf /data/owntone-config/owntone.conf && chmod 0644 /data/owntone-config/owntone.conf && chown -R 1000:1000 /data/media /data/owntone-cache /data/owntone-config
     volumes:
       - ${APP_DATA_DIR}/data:/data
 
@@ -48,7 +48,7 @@ services:
       UID: "1000"
       GID: "1000"
     volumes:
-      - ./owntone.conf:/etc/owntone/owntone.conf:ro
+      - ${APP_DATA_DIR}/data/owntone-config:/etc/owntone:ro
       - ${APP_DATA_DIR}/data/media:/srv/media
       - ${APP_DATA_DIR}/data/owntone-cache:/var/cache/owntone
 

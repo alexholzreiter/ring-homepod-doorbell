@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY src ./src
+COPY owntone.conf ./owntone.conf
 
 ENV NODE_ENV=production
 ENV DATA_DIR=/data

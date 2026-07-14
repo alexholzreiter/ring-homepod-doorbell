@@ -41,3 +41,12 @@ test("Runtipi compose does not depend on unavailable UID variables", () => {
 
   assert.doesNotMatch(compose, /\$\{(?:UID|GID)\}/);
 });
+
+test("OwnTone receives a configuration directory instead of a file mount", () => {
+  const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
+  const dockerfile = fs.readFileSync(path.join(root, "Dockerfile"), "utf8");
+
+  assert.match(dockerfile, /COPY owntone\.conf \.\/owntone\.conf/);
+  assert.match(compose, /owntone-config:\/etc\/owntone:ro/);
+  assert.doesNotMatch(compose, /:\/etc\/owntone\/owntone\.conf/);
+});
