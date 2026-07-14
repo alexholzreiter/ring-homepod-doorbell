@@ -10,6 +10,7 @@ const packagedFiles = [
   "config.json",
   "docker-compose.yml",
   "owntone.conf",
+  "metadata/DoorHomePodBell_logo.png",
   "metadata/description.md",
   "metadata/logo.jpg",
   "metadata/logo.svg",

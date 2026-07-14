@@ -1,6 +1,6 @@
 services:
   ring-homepod-doorbell:
-    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.9
+    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.10
     restart: unless-stopped
     network_mode: host
     depends_on:
