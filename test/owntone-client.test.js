@@ -64,18 +64,17 @@ test("playTrack selects outputs, sets volume and starts a clean queue", async ()
     },
   });
 
-  const previous = await client.playTrack(
+  await client.playTrack(
     { uri: "library:track:7", length_ms: 1200 },
     ["pod"],
     65
   );
-  assert.equal(previous.find((output) => output.id === "old").selected, true);
   assert.ok(calls.some((call) => call.url.endsWith("/api/outputs/set")));
   assert.ok(calls.some((call) => call.url.endsWith("/api/queue/clear")));
   assert.ok(calls.some((call) => call.url.includes("/api/queue/items/add?") && call.url.includes("playback=start")));
 });
 
-test("stopAndRestore restores volumes sequentially before the selected outputs", async () => {
+test("prepareOutputs keeps the configured selection and volume", async () => {
   const calls = [];
   const client = new OwnToneClient("http://owntone", {
     fetch: async (url, options = {}) => {
@@ -84,14 +83,27 @@ test("stopAndRestore restores volumes sequentially before the selected outputs",
     },
   });
 
-  await client.stopAndRestore([
-    { id: "one", selected: true, volume: 20 },
-    { id: "two", selected: false, volume: 40 },
-  ]);
+  await client.prepareOutputs(["one", "two"], 86);
 
-  assert.match(calls[0].url, /\/api\/player\/stop$/);
+  assert.match(calls[0].url, /\/api\/outputs\/set$/);
   assert.match(calls[1].url, /\/api\/outputs\/one$/);
   assert.match(calls[2].url, /\/api\/outputs\/two$/);
-  assert.match(calls[3].url, /\/api\/outputs\/set$/);
-  assert.deepEqual(JSON.parse(calls[3].options.body), { outputs: ["one"] });
+  assert.deepEqual(JSON.parse(calls[0].options.body), { outputs: ["one", "two"] });
+  assert.deepEqual(JSON.parse(calls[1].options.body), { selected: true, volume: 86 });
+  assert.deepEqual(JSON.parse(calls[2].options.body), { selected: true, volume: 86 });
+});
+
+test("getOutputs retries while OwnTone is restarting", async () => {
+  let attempts = 0;
+  const client = new OwnToneClient("http://owntone", {
+    retryDelayMs: 0,
+    fetch: async () => {
+      attempts += 1;
+      if (attempts < 3) throw new TypeError("fetch failed");
+      return jsonResponse({ outputs: [{ id: "office" }] });
+    },
+  });
+
+  assert.deepEqual(await client.getOutputs(), [{ id: "office" }]);
+  assert.equal(attempts, 3);
 });

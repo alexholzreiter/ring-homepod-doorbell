@@ -185,7 +185,7 @@ elements.save.addEventListener("click", async () => {
   elements.save.disabled = true;
   try {
     const selectedOutputIds = [...document.querySelectorAll(".output-checkbox:checked")].map((item) => item.value);
-    await api("/api/settings", {
+    const result = await api("/api/settings", {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -196,7 +196,7 @@ elements.save.addEventListener("click", async () => {
       }),
     });
     formDirty = false;
-    showNotice("Einstellungen gespeichert.", true);
+    showNotice(result.warning || "Einstellungen und Gerätelautstärke gespeichert.", !result.warning);
     await loadStatus({ forceForm: true, quiet: true });
   } catch (error) {
     showNotice(error.message);

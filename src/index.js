@@ -133,7 +133,6 @@ async function playCustomChime() {
   }
 
   state.playbackActive = true;
-  let previous;
   try {
     const outputs = await getOwnToneOutputs();
     const outputIds = selectOutputIds(outputs, settings);
@@ -141,16 +140,13 @@ async function playCustomChime() {
       throw new Error("Keine ausgewählten, erreichbaren AirPlay-Lautsprecher gefunden.");
     }
     const track = await ownTone.findTrack(settings.chimeFilename);
-    previous = await ownTone.playTrack(track, outputIds, settings.volume);
+    await ownTone.playTrack(track, outputIds, settings.volume);
     state.lastPlaybackAt = new Date().toISOString();
     console.log(`Klingelton auf ${outputIds.length} AirPlay-Ausgang/Ausgängen gestartet.`);
 
     const playbackTime = Math.min(Math.max(Number(track.length_ms) || 5000, 1000), 60000);
     await new Promise((resolve) => setTimeout(resolve, playbackTime + 1500));
   } finally {
-    if (previous) await ownTone.stopAndRestore(previous).catch((error) => {
-      console.error("AirPlay-Zustand konnte nicht vollständig wiederhergestellt werden:", error);
-    });
     state.playbackActive = false;
   }
 }
@@ -242,13 +238,25 @@ app.get("/api/status", async (_req, res) => {
   });
 });
 
-app.put("/api/settings", (req, res) => {
+app.put("/api/settings", async (req, res) => {
   const candidate = normalizeSettings({ ...settings, ...req.body, chimeFilename: settings.chimeFilename });
   if (!candidate.useAllOutputs && !candidate.selectedOutputIds.length) {
     return res.status(400).json({ error: "Wähle mindestens einen HomePod aus." });
   }
   settings = settingsStore.write(candidate);
-  return res.json({ ok: true, settings });
+  try {
+    const outputs = await getOwnToneOutputs();
+    const outputIds = selectOutputIds(outputs, settings);
+    await ownTone.prepareOutputs(outputIds, settings.volume);
+    return res.json({ ok: true, settings });
+  } catch (error) {
+    state.lastError = errorMessage(error);
+    return res.json({
+      ok: true,
+      settings,
+      warning: "Einstellungen gespeichert, aber OwnTone ist gerade nicht erreichbar.",
+    });
+  }
 });
 
 app.post("/api/chime", upload.single("chime"), async (req, res) => {

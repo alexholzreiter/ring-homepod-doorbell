@@ -9,6 +9,7 @@ export class OwnToneClient {
     this.baseUrl = baseUrl.replace(/\/$/, "");
     this.fetch = options.fetch ?? globalThis.fetch;
     this.mediaPath = options.mediaPath ?? "/srv/media";
+    this.retryDelayMs = options.retryDelayMs ?? 1000;
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
@@ -36,9 +37,18 @@ export class OwnToneClient {
     return contentType.includes("json") ? response.json() : response.text();
   }
 
-  async getOutputs() {
-    const data = await this.request("/api/outputs");
-    return Array.isArray(data?.outputs) ? data.outputs : [];
+  async getOutputs(attempts = 4) {
+    let lastError;
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      try {
+        const data = await this.request("/api/outputs");
+        return Array.isArray(data?.outputs) ? data.outputs : [];
+      } catch (error) {
+        lastError = error;
+        if (attempt < attempts - 1) await sleep(this.retryDelayMs);
+      }
+    }
+    throw lastError;
   }
 
   async getPlayer() {
@@ -77,6 +87,13 @@ export class OwnToneClient {
     });
   }
 
+  async prepareOutputs(outputIds, volume) {
+    await this.setOutputs(outputIds);
+    for (const id of outputIds) {
+      await this.configureOutput(id, { selected: true, volume });
+    }
+  }
+
   async pairOutput(outputId, pin) {
     return this.configureOutput(outputId, { pin });
   }
@@ -89,40 +106,15 @@ export class OwnToneClient {
       throw new Error(`Nicht erreichbare AirPlay-Ausgänge: ${missingIds.join(", ")}`);
     }
 
-    const previous = outputs.map((output) => ({
-      id: String(output.id),
-      selected: Boolean(output.selected),
-      volume: Number(output.volume),
-    }));
+    await this.prepareOutputs(outputIds, volume);
+    await this.request("/api/queue/clear", { method: "PUT" });
 
-    try {
-      await this.setOutputs(outputIds);
-      for (const id of outputIds) {
-        await this.configureOutput(id, { selected: true, volume });
-      }
-
-      await this.request("/api/queue/clear", { method: "PUT" });
-
-      const query = new URLSearchParams({
-        playback: "start",
-        shuffle: "false",
-        uris: track.uri,
-      });
-      await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
-      return previous;
-    } catch (error) {
-      await this.stopAndRestore(previous).catch(() => null);
-      throw error;
-    }
-  }
-
-  async stopAndRestore(previous) {
-    await this.request("/api/player/stop", { method: "PUT" });
-    await sleep(250);
-    for (const output of previous.filter((item) => Number.isFinite(item.volume))) {
-      await this.configureOutput(output.id, { volume: output.volume }).catch(() => null);
-    }
-    await this.setOutputs(previous.filter((output) => output.selected).map((output) => output.id));
+    const query = new URLSearchParams({
+      playback: "start",
+      shuffle: "false",
+      uris: track.uri,
+    });
+    await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
   }
 }
 
