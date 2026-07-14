@@ -12,7 +12,7 @@ import {
   uuid,
 } from "@homebridge/hap-nodejs";
 import { RingApi } from "ring-client-api";
-import { OwnToneClient, selectOutputIds } from "./owntone-client.js";
+import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
 
 const DATA_DIR = process.env.DATA_DIR || "/data";
@@ -227,7 +227,7 @@ app.get("/api/status", async (_req, res) => {
     homekitEnabled: HOMEKIT_ENABLED,
     settings,
     chimeUrl: settings.chimeFilename ? "/api/chime" : null,
-    outputs: outputs.filter((output) => String(output.type).toLowerCase() === "airplay"),
+    outputs: outputs.filter(isAirPlayOutput),
   });
 });
 

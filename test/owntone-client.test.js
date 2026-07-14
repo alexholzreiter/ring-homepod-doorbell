@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { OwnToneClient, selectOutputIds } from "../src/owntone-client.js";
+import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "../src/owntone-client.js";
 
 function jsonResponse(value, status = 200) {
   return new Response(JSON.stringify(value), {
@@ -12,7 +12,7 @@ function jsonResponse(value, status = 200) {
 test("selectOutputIds returns all AirPlay outputs or only configured ones", () => {
   const outputs = [
     { id: "kitchen", type: "AirPlay" },
-    { id: "office", type: "AirPlay" },
+    { id: "office", type: "AirPlay 2" },
     { id: "local", type: "ALSA" },
   ];
   assert.deepEqual(selectOutputIds(outputs, { useAllOutputs: true, selectedOutputIds: [] }), [
@@ -23,6 +23,12 @@ test("selectOutputIds returns all AirPlay outputs or only configured ones", () =
     selectOutputIds(outputs, { useAllOutputs: false, selectedOutputIds: ["office", "missing"] }),
     ["office"]
   );
+});
+
+test("isAirPlayOutput accepts OwnTone AirPlay and AirPlay 2 types", () => {
+  assert.equal(isAirPlayOutput({ type: "AirPlay" }), true);
+  assert.equal(isAirPlayOutput({ type: "AirPlay 2" }), true);
+  assert.equal(isAirPlayOutput({ type: "ALSA" }), false);
 });
 
 test("findTrack resolves the exact shared media path", async () => {

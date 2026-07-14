@@ -128,10 +128,12 @@ export class OwnToneClient {
   }
 }
 
+export function isAirPlayOutput(output) {
+  return /^airplay(?:\s+\d+)?$/i.test(String(output?.type ?? "").trim());
+}
+
 export function selectOutputIds(outputs, settings) {
-  const airPlayOutputs = outputs.filter(
-    (output) => String(output.type).toLowerCase() === "airplay"
-  );
+  const airPlayOutputs = outputs.filter(isAirPlayOutput);
   const requested = settings.useAllOutputs
     ? airPlayOutputs.map((output) => String(output.id))
     : settings.selectedOutputIds.map(String);

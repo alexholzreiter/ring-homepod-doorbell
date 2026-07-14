@@ -1,6 +1,6 @@
 services:
   ring-homepod-doorbell:
-    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.3
+    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.4
     restart: unless-stopped
     network_mode: host
     depends_on:
@@ -27,7 +27,7 @@ services:
       internal_port: 8585
 
   prepare:
-    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.3
+    image: ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.4
     restart: "no"
     user: "0:0"
     command:
