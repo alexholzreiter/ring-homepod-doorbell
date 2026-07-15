@@ -19,6 +19,7 @@ test("marketing website has the expected domain and deployment workflow", async 
   assert.match(workflow, /actions\/upload-pages-artifact@v4/);
   assert.match(workflow, /actions\/deploy-pages@v4/);
   assert.match(workflow, /path: website/);
+  assert.match(workflow, /include-hidden-files: true/);
 });
 
 test("marketing website exposes clear GitHub, Runtipi, Docker, and support calls to action", async () => {
