@@ -6,6 +6,10 @@ A self-hosted bridge for:
 Ring doorbell press → custom chime → selected HomePods
 ```
 
+**Website:** [doorbell.klickwerk.digital](https://doorbell.klickwerk.digital)
+
+**Install:** [Runtipi](#install-on-runtipi) · [Docker Compose](#run-locally-with-docker-compose)
+
 The app receives doorbell events through `ring-client-api`. A dedicated
 OwnTone service plays the uploaded audio file in sync across multiple AirPlay
 speakers. The web interface manages the chime, HomePod selection, volume, and
@@ -23,6 +27,10 @@ language switch changes the complete interface between English and German.
 
 Configure the chime, speakers, volume, and cooldown directly in the browser.
 All settings remain local on your own server.
+
+The public marketing website is a static, tracking-free GitHub Pages site. Its
+source lives in [`website/`](website/) and is deployed automatically after
+changes are pushed to `main`.
 
 ## Support
 
