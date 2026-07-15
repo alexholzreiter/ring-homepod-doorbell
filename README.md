@@ -25,6 +25,13 @@ wechseln.
 Klingelton, Lautsprecher, Lautstärke und Sperrzeit werden direkt im Browser
 konfiguriert. Alle Einstellungen bleiben lokal auf dem eigenen Server.
 
+## Support
+
+Wenn dir das Projekt gefällt und du seine Weiterentwicklung unterstützen
+möchtest, kannst du mich über Stripe auf einen Kaffee einladen:
+
+[![Tip a coffee with Stripe](https://img.shields.io/badge/Tip%20a%20coffee-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04)
+
 ## Voraussetzungen
 
 - Ring-Konto mit eingerichteter Doorbell
@@ -90,9 +97,9 @@ Das Verzeichnis `runtipi/` enthält zusätzlich dieselbe Appdefinition als
 einzeln kopierbares Paket.
 
 Die App verwendet das Image
-`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.11`. Der Workflow
+`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.12`. Der Workflow
 `.github/workflows/container.yml` veröffentlicht es für `amd64` und `arm64`,
-sobald das Git-Tag `v0.2.11` gepusht wird.
+sobald das Git-Tag `v0.2.12` gepusht wird.
 
 Bei jedem App-Release muss zusätzlich `tipi_version` in beiden Runtipi-
 `config.json`-Dateien erhöht werden. Runtipi verwendet diesen ganzzahligen
