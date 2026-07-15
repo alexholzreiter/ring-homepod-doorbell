@@ -1,59 +1,57 @@
 # Ring HomePod Doorbell
 
-Eine selbst gehostete Bridge für:
+A self-hosted bridge for:
 
 ```text
-Ring-Tastendruck → eigener Klingelton → ausgewählte HomePods
+Ring doorbell press → custom chime → selected HomePods
 ```
 
-Die App empfängt das Klingelereignis über `ring-client-api`. Ein eigener
-OwnTone-Dienst spielt die hochgeladene Audiodatei synchron auf mehreren
-AirPlay-Lautsprechern ab. Die Weboberfläche verwaltet Klingelton, HomePods,
-Lautstärke und eine Sperrzeit gegen doppelte Ring-Ereignisse. Sie kann dauerhaft
-zwischen Deutsch und Englisch umgeschaltet werden.
+The app receives doorbell events through `ring-client-api`. A dedicated
+OwnTone service plays the uploaded audio file in sync across multiple AirPlay
+speakers. The web interface manages the chime, HomePod selection, volume, and
+a cooldown that prevents duplicate Ring events. The entire interface can be
+switched persistently between English and German.
 
-## Weboberfläche
+## Web interface
 
-![Ring HomePod Doorbell – Startseite](docs/screenshots/web-hero.jpg)
+![Ring HomePod Doorbell – home page](docs/screenshots/web-hero.jpg)
 
-Die Startseite zeigt Ring-, AirPlay- und Klingeltonstatus auf einen Blick. Über
-den Sprachschalter kann die komplette Oberfläche zwischen Deutsch und Englisch
-wechseln.
+The home page shows the Ring, AirPlay, and chime status at a glance. The
+language switch changes the complete interface between English and German.
 
-![Ring HomePod Doorbell – Einrichtung und Live-Status](docs/screenshots/web-setup.jpg)
+![Ring HomePod Doorbell – setup and live status](docs/screenshots/web-setup.jpg)
 
-Klingelton, Lautsprecher, Lautstärke und Sperrzeit werden direkt im Browser
-konfiguriert. Alle Einstellungen bleiben lokal auf dem eigenen Server.
+Configure the chime, speakers, volume, and cooldown directly in the browser.
+All settings remain local on your own server.
 
 ## Support
 
-Wenn dir das Projekt gefällt und du seine Weiterentwicklung unterstützen
-möchtest, kannst du mich über Stripe auf einen Kaffee einladen:
+If you enjoy the project and would like to support its continued development,
+you can tip me a coffee through Stripe:
 
 [![Tip a coffee with Stripe](https://img.shields.io/badge/Tip%20a%20coffee-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04)
 
-## Voraussetzungen
+## Requirements
 
-- Ring-Konto mit eingerichteter Doorbell
-- HomePods und Runtipi-Server im selben lokalen Netzwerk/VLAN
-- Apple Home: **Einstellungen des Zuhauses → Lautsprecher & TV → Alle im
-  selben Netzwerk**
-- Docker Compose oder Runtipi
+- A Ring account with a configured doorbell
+- HomePods and the Runtipi server on the same local network/VLAN
+- Apple Home: **Home Settings → Speakers & TV → Anyone On the Same Network**
+- Docker Compose or Runtipi
 
-> Die Ring-Anbindung verwendet eine inoffizielle API. Änderungen aufseiten von
-> Ring können deshalb künftig ein Update der App notwendig machen.
+> The Ring integration uses an unofficial API. Changes made by Ring may
+> therefore require a future app update.
 
-## Ring Refresh-Token erzeugen
+## Generate a Ring refresh token
 
-Auf einem vertrauenswürdigen Rechner mit Node.js:
+Run the following command on a trusted computer with Node.js installed:
 
 ```bash
 npx -p ring-client-api ring-auth-cli
 ```
 
-Der Token ist ein Geheimnis und darf nicht in Git eingecheckt werden.
+The token is a secret and must never be committed to Git.
 
-## Lokal mit Docker Compose starten
+## Run locally with Docker Compose
 
 ```bash
 cp .env.example .env
@@ -62,26 +60,26 @@ docker compose up -d --build
 docker compose logs -f
 ```
 
-Danach `http://IP-DES-SERVERS:8585` öffnen, eine Audiodatei hochladen, die
-HomePods auswählen und **Klingelton testen** drücken.
+Then open `http://YOUR-SERVER-IP:8585`, upload an audio file, select the
+HomePods, and press **Test chime**.
 
-Persistente Daten liegen in `data/`:
+Persistent data is stored in `data/`:
 
-- `data/settings.json`: Lautsprecher- und Wiedergabeeinstellungen
-- `data/media/`: hochgeladener Klingelton
-- `data/owntone-cache/`: OwnTone-Datenbank und AirPlay-Zustand
-- `data/ring-refresh-token.txt`: automatisch aktualisierter Ring-Token
+- `data/settings.json`: speaker and playback settings
+- `data/media/`: uploaded chime
+- `data/owntone-cache/`: OwnTone database and AirPlay state
+- `data/ring-refresh-token.txt`: automatically updated Ring token
 
-## Runtipi installieren
+## Install on Runtipi
 
-Dieses Repository ist gleichzeitig ein persönlicher Runtipi-App-Store. Füge in
-Runtipi unter **Einstellungen → App Stores** diese URL hinzu:
+This repository also serves as a custom Runtipi app store. In Runtipi, open
+**Settings → App Stores** and add this URL:
 
 ```text
 https://github.com/alexholzreiter/ring-homepod-doorbell
 ```
 
-Runtipi findet die App anschließend unter:
+Runtipi then discovers the app in:
 
 ```text
 apps/ring-homepod-doorbell/
@@ -93,52 +91,51 @@ apps/ring-homepod-doorbell/
     └── logo.jpg
 ```
 
-Das Verzeichnis `runtipi/` enthält zusätzlich dieselbe Appdefinition als
-einzeln kopierbares Paket.
+The `runtipi/` directory contains the same app definition as a standalone,
+copyable package.
 
-Die App verwendet das Image
-`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.12`. Der Workflow
-`.github/workflows/container.yml` veröffentlicht es für `amd64` und `arm64`,
-sobald das Git-Tag `v0.2.12` gepusht wird.
+The app uses the container image
+`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.12`. The workflow
+`.github/workflows/container.yml` publishes it for `amd64` and `arm64` when
+the Git tag `v0.2.12` is pushed.
 
-Bei jedem App-Release muss zusätzlich `tipi_version` in beiden Runtipi-
-`config.json`-Dateien erhöht werden. Runtipi verwendet diesen ganzzahligen
-Revisionszähler, um installierten Apps ein Update anzubieten und deren
-angezeigte Version zu aktualisieren.
+For every app release, `tipi_version` must also be incremented in both Runtipi
+`config.json` files. Runtipi uses this integer revision counter to offer
+updates for installed apps and refresh their displayed version.
 
-Nach der ersten Veröffentlichung muss das Container-Paket auf GitHub öffentlich
-sichtbar sein, damit Runtipi es ohne Registry-Anmeldung laden kann.
+After the first release, the container package on GitHub must be public so
+Runtipi can pull it without registry authentication.
 
-Runtipi muss Host-Networking erlauben. Das ist nötig, damit OwnTone die
-HomePods per mDNS findet und AirPlay-Verbindungen aufbauen kann. Die App ist
-bewusst nicht über Runtipi ins Internet exponierbar.
+Runtipi must allow host networking. OwnTone requires it to discover HomePods
+through mDNS and establish AirPlay connections. The app is intentionally not
+exposable to the internet through Runtipi.
 
-## Optionaler Apple-HomeKit-Gong
+## Optional Apple HomeKit chime
 
-`HOMEKIT_ENABLED=true` veröffentlicht zusätzlich eine virtuelle
-HomeKit-Türklingel. Nach dem Koppeln kann Apple seinen normalen Gong auf den
-HomePods wiedergeben. Das ist für den eigenen Klingelton nicht erforderlich
-und kann bei Aktivierung zu zwei direkt aufeinanderfolgenden Gongs führen.
+Setting `HOMEKIT_ENABLED=true` also publishes a virtual HomeKit doorbell. Once
+paired, Apple can play its standard chime on the HomePods. This is not required
+for custom audio playback and may result in two consecutive chimes when
+enabled.
 
-Kopplung in Apple Home:
+Pairing in Apple Home:
 
-1. **+ → Gerät hinzufügen → Weitere Optionen** öffnen.
-2. `Ring Haustür` auswählen.
-3. `HOMEKIT_PIN` eingeben.
+1. Open **+ → Add Accessory → More Options**.
+2. Select `Ring Haustür`.
+3. Enter the `HOMEKIT_PIN`.
 
-## Verhalten und Grenzen
+## Behavior and limitations
 
-- OwnTone übernimmt für die Dauer des Klingeltons die AirPlay-Ausgabe. Bereits
-  laufende Musik auf einem HomePod kann dadurch unterbrochen werden.
-- Die Lautstärke und die zuvor in OwnTone gewählten Ausgänge werden nach dem
-  Klingelton wiederhergestellt.
-- Ein leeres Lautsprecher-Set mit aktivierter Option „Alle“ umfasst jedes
-  gefundene AirPlay-Gerät, also gegebenenfalls auch Apple TVs oder andere
-  AirPlay-Lautsprecher.
-- Bei getrennten VLANs müssen mDNS und die dynamischen AirPlay-Ports zwischen
-  Server und HomePods geroutet werden.
+- OwnTone takes over the AirPlay output for the duration of the chime. This
+  may interrupt music already playing on a HomePod.
+- The volume and the outputs previously selected in OwnTone are restored after
+  the chime finishes.
+- An empty speaker selection with the “All” option enabled includes every
+  discovered AirPlay device, potentially including Apple TVs and other
+  AirPlay speakers.
+- When using separate VLANs, mDNS and the dynamic AirPlay ports must be routed
+  between the server and the HomePods.
 
-## Entwicklung
+## Development
 
 ```bash
 npm install
@@ -147,7 +144,7 @@ docker compose config
 docker build -t ring-homepod-doorbell:test .
 ```
 
-Status-Endpunkte:
+Status endpoints:
 
 - `GET /api/status`
-- `GET /health` (`200`, wenn Ring und OwnTone verbunden sind; sonst `503`)
+- `GET /health` (`200` when Ring and OwnTone are connected; otherwise `503`)
