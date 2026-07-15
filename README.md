@@ -12,6 +12,19 @@ AirPlay-Lautsprechern ab. Die Weboberfläche verwaltet Klingelton, HomePods,
 Lautstärke und eine Sperrzeit gegen doppelte Ring-Ereignisse. Sie kann dauerhaft
 zwischen Deutsch und Englisch umgeschaltet werden.
 
+## Weboberfläche
+
+![Ring HomePod Doorbell – Startseite](docs/screenshots/web-hero.jpg)
+
+Die Startseite zeigt Ring-, AirPlay- und Klingeltonstatus auf einen Blick. Über
+den Sprachschalter kann die komplette Oberfläche zwischen Deutsch und Englisch
+wechseln.
+
+![Ring HomePod Doorbell – Einrichtung und Live-Status](docs/screenshots/web-setup.jpg)
+
+Klingelton, Lautsprecher, Lautstärke und Sperrzeit werden direkt im Browser
+konfiguriert. Alle Einstellungen bleiben lokal auf dem eigenen Server.
+
 ## Voraussetzungen
 
 - Ring-Konto mit eingerichteter Doorbell
