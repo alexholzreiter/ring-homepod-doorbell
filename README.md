@@ -156,3 +156,8 @@ Status endpoints:
 
 - `GET /api/status`
 - `GET /health` (`200` when Ring and OwnTone are connected; otherwise `503`)
+
+## License
+
+Ring HomePod Doorbell is open-source software licensed under the
+[MIT License](LICENSE). Copyright © 2026 Alexander Holzreiter.

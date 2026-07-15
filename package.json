@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "description": "Plays a custom Ring doorbell chime on HomePods via OwnTone/AirPlay.",
+  "author": "Alexander Holzreiter",
+  "license": "MIT",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

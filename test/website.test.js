@@ -55,3 +55,18 @@ test("website references only local visual assets", async () => {
     await assert.doesNotReject(readFile(new URL(`../website/${path}`, import.meta.url)));
   }
 });
+
+test("project and marketing website declare the MIT license", async () => {
+  const [license, packageJson, html, readme] = await Promise.all([
+    read("LICENSE"),
+    read("package.json"),
+    read("website/index.html"),
+    read("README.md"),
+  ]);
+
+  assert.match(license, /^MIT License/);
+  assert.match(license, /Copyright \(c\) 2026 Alexander Holzreiter/);
+  assert.equal(JSON.parse(packageJson).license, "MIT");
+  assert.match(html, /https:\/\/opensource\.org\/license\/mit/);
+  assert.match(readme, /\[MIT License\]\(LICENSE\)/);
+});
