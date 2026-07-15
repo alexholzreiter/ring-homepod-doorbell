@@ -5,20 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#171822">
     <meta name="color-scheme" content="light">
-    <title>Ring HomePod Doorbell — Your doorbell. Your sound.</title>
+    <title>Ring HomePod Doorbell — Custom chimes on HomePods</title>
+    <meta name="author" content="Alexander Holzreiter">
     <meta name="description" content="Play a custom Ring Doorbell chime on selected HomePods and AirPlay speakers. Open-source, self-hosted, and local-first.">
     <meta name="robots" content="index,follow">
     <link rel="canonical" href="https://doorbell.klickwerk.digital/">
+    <link rel="alternate" type="application/rss+xml" title="Ring HomePod Doorbell updates" href="https://doorbell.klickwerk.digital/feed.xml">
     <link rel="icon" href="assets/logo.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/logo.png">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ring HomePod Doorbell">
-    <meta property="og:title" content="Your Ring Doorbell. Your sound. Every room.">
+    <meta property="og:title" content="Ring HomePod Doorbell — Custom chimes on HomePods">
     <meta property="og:description" content="A self-hosted bridge that plays your custom doorbell chime on selected HomePods and AirPlay speakers.">
     <meta property="og:url" content="https://doorbell.klickwerk.digital/">
     <meta property="og:image" content="https://doorbell.klickwerk.digital/assets/app-overview.jpg">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Ring HomePod Doorbell">
+    <meta name="twitter:title" content="Ring HomePod Doorbell — Custom chimes on HomePods">
     <meta name="twitter:description" content="Your Ring Doorbell. Your sound. Every room.">
     <meta name="twitter:image" content="https://doorbell.klickwerk.digital/assets/app-overview.jpg">
     <link rel="stylesheet" href="styles.css">
@@ -26,15 +28,118 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Ring HomePod Doorbell",
-        "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "Docker, Runtipi",
-        "url": "https://doorbell.klickwerk.digital/",
-        "downloadUrl": "https://github.com/alexholzreiter/ring-homepod-doorbell",
-        "isAccessibleForFree": true,
-        "license": "https://opensource.org/license/mit",
-        "description": "A self-hosted bridge that plays a custom Ring Doorbell chime on selected HomePods and AirPlay speakers."
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://doorbell.klickwerk.digital/#publisher",
+            "name": "klickwerk",
+            "url": "https://klickwerk.digital/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://klickwerk.digital/hubfs/klickwerk_icon-2.png"
+            },
+            "email": "laura@klickwerk.digital",
+            "telephone": "+43 677 64314340",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Dörfl 30",
+              "postalCode": "3072",
+              "addressLocality": "Kasten bei Böheimkirchen",
+              "addressCountry": "AT"
+            },
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "customer support",
+              "email": "laura@klickwerk.digital",
+              "telephone": "+43 677 64314340",
+              "availableLanguage": ["German", "English"],
+              "url": "https://klickwerk.digital/kontakt"
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://doorbell.klickwerk.digital/#author",
+            "name": "Alexander Holzreiter",
+            "url": "https://github.com/alexholzreiter"
+          },
+          {
+            "@type": "Brand",
+            "@id": "https://doorbell.klickwerk.digital/#brand",
+            "name": "Ring HomePod Doorbell",
+            "url": "https://doorbell.klickwerk.digital/",
+            "logo": "https://doorbell.klickwerk.digital/assets/logo.png"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://doorbell.klickwerk.digital/#website",
+            "name": "Ring HomePod Doorbell",
+            "url": "https://doorbell.klickwerk.digital/",
+            "description": "The official website for the self-hosted Ring-to-AirPlay custom chime bridge.",
+            "inLanguage": ["en", "de"],
+            "publisher": { "@id": "https://doorbell.klickwerk.digital/#publisher" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://doorbell.klickwerk.digital/#software",
+            "name": "Ring HomePod Doorbell",
+            "brand": { "@id": "https://doorbell.klickwerk.digital/#brand" },
+            "isPartOf": { "@id": "https://doorbell.klickwerk.digital/#website" },
+            "author": { "@id": "https://doorbell.klickwerk.digital/#author" },
+            "publisher": { "@id": "https://doorbell.klickwerk.digital/#publisher" },
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Docker, Runtipi",
+            "softwareVersion": "0.2.12",
+            "url": "https://doorbell.klickwerk.digital/",
+            "downloadUrl": "https://github.com/alexholzreiter/ring-homepod-doorbell",
+            "sameAs": "https://github.com/alexholzreiter/ring-homepod-doorbell",
+            "isAccessibleForFree": true,
+            "license": "https://opensource.org/license/mit",
+            "screenshot": [
+              "https://doorbell.klickwerk.digital/assets/app-overview.jpg",
+              "https://doorbell.klickwerk.digital/assets/app-setup.jpg"
+            ],
+            "featureList": [
+              "Custom chime upload in six audio formats",
+              "Synchronized playback on selected AirPlay 2 speakers",
+              "Individual speaker selection and volume",
+              "Runtipi and Docker Compose deployment",
+              "English and German web interface"
+            ],
+            "description": "A self-hosted bridge that plays a custom Ring Doorbell chime on selected HomePods and AirPlay speakers."
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://doorbell.klickwerk.digital/#faq-schema",
+            "isPartOf": { "@id": "https://doorbell.klickwerk.digital/#website" },
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does it work with HomePod mini?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. OwnTone discovers HomePod and HomePod mini models as AirPlay 2 outputs. They must be reachable from the server on the same network or through correctly routed mDNS." }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I choose individual speakers?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select any combination of discovered AirPlay speakers or automatically include every available output. Volume is configurable as well." }
+              },
+              {
+                "@type": "Question",
+                "name": "Will it interrupt music?",
+                "acceptedAnswer": { "@type": "Answer", "text": "It can. OwnTone temporarily takes over the selected AirPlay outputs for the duration of the chime and restores its previous output selection and volume afterward." }
+              },
+              {
+                "@type": "Question",
+                "name": "Do I need HomeKit?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. The custom chime works through Ring and OwnTone. An optional virtual HomeKit doorbell can be enabled separately for Apple's standard chime." }
+              },
+              {
+                "@type": "Question",
+                "name": "Is this an official Ring or Apple product?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. It is an independent open-source project. The Ring connection uses an unofficial API, so future changes by Ring may require an app update." }
+              }
+            ]
+          }
+        ]
       }
     </script>
   </head>
@@ -59,6 +164,7 @@
           <a href="#how-it-works" data-en="How it works" data-de="So funktioniert es">How it works</a>
           <a href="#install" data-en="Install" data-de="Installieren">Install</a>
           <a href="#faq">FAQ</a>
+          <a href="about/" data-en="About" data-de="Über das Projekt">About</a>
         </div>
 
         <div class="nav-actions">
@@ -78,15 +184,15 @@
       <section id="top" class="hero shell">
         <div class="hero-copy reveal">
           <span class="eyebrow"><i></i><span data-en="Open source · Self-hosted · Local-first" data-de="Open Source · Selbst gehostet · Lokal">Open source · Self-hosted · Local-first</span></span>
-          <h1><span data-en="Your doorbell." data-de="Deine Klingel.">Your doorbell.</span><br><em data-en="Your sound." data-de="Dein Sound.">Your sound.</em><br><span data-en="Every room." data-de="In jedem Raum.">Every room.</span></h1>
-          <p data-en="Turn every Ring Doorbell press into a custom chime on the HomePods and AirPlay speakers you choose — synchronized, configurable, and running on your own server." data-de="Spiele bei jedem Klingeln deiner Ring Doorbell einen eigenen Ton auf ausgewählten HomePods und AirPlay-Lautsprechern – synchron, konfigurierbar und auf deinem eigenen Server.">Turn every Ring Doorbell press into a custom chime on the HomePods and AirPlay speakers you choose — synchronized, configurable, and running on your own server.</p>
+          <h1><span>Ring HomePod Doorbell.</span><br><em data-en="Your sound." data-de="Dein Sound.">Your sound.</em><br><span data-en="Every room." data-de="In jedem Raum.">Every room.</span></h1>
+          <p data-en="Turn every Ring Doorbell press into a custom chime on selected HomePods and AirPlay speakers — synchronized, configurable, and running on a server you control." data-de="Spiele bei jedem Klingeln deiner Ring Doorbell einen eigenen Ton auf ausgewählten HomePods und AirPlay-Lautsprechern – synchron, konfigurierbar und auf einem Server unter deiner Kontrolle.">Turn every Ring Doorbell press into a custom chime on selected HomePods and AirPlay speakers — synchronized, configurable, and running on a server you control.</p>
           <div class="hero-actions">
             <a class="button button-primary" href="https://github.com/alexholzreiter/ring-homepod-doorbell" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4M8 19c-3 .9-3-1.5-4-2"/></svg>
               <span data-en="View on GitHub" data-de="Auf GitHub ansehen">View on GitHub</span>
             </a>
             <a class="button button-secondary" href="#install">
-              <span data-en="Choose your install" data-de="Installation wählen">Choose your install</span>
+              <span data-en="Choose an install method" data-de="Installation wählen">Choose an install method</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </a>
           </div>
@@ -133,7 +239,7 @@
           <article class="feature-card feature-main reveal">
             <span class="feature-icon orange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l10-2v13M9 9l10-2M6 18a3 2 0 1 0 0 .1M16 16a3 2 0 1 0 0 .1"/></svg></span>
             <span class="feature-number">01</span>
-            <h3 data-en="Your chime, not ours." data-de="Dein Klingelton, nicht unserer.">Your chime, not ours.</h3>
+            <h3 data-en="A chime that feels like home." data-de="Ein Klingelton, der zu deinem Zuhause passt.">A chime that feels like home.</h3>
             <p data-en="Upload MP3, WAV, M4A, AAC, FLAC, or OGG. Pick the sound that belongs in your home." data-de="Lade MP3, WAV, M4A, AAC, FLAC oder OGG hoch. Wähle den Sound, der zu deinem Zuhause passt.">Upload MP3, WAV, M4A, AAC, FLAC, or OGG. Pick the sound that belongs in your home.</p>
             <div class="waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
           </article>
@@ -168,7 +274,7 @@
           <div class="process-grid">
             <article class="process-card reveal"><span class="process-index">01</span><div class="process-visual ring-visual"><span class="ring-device"><i></i></span></div><h3 data-en="Ring detects a press" data-de="Ring erkennt das Klingeln">Ring detects a press</h3><p data-en="The bridge listens for the doorbell event through ring-client-api." data-de="Die Bridge empfängt das Klingelereignis über ring-client-api.">The bridge listens for the doorbell event through ring-client-api.</p></article>
             <span class="process-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-            <article class="process-card reveal"><span class="process-index">02</span><div class="process-visual bridge-visual"><img src="assets/logo.png" alt=""><span></span><span></span></div><h3 data-en="Your bridge takes over" data-de="Deine Bridge übernimmt">Your bridge takes over</h3><p data-en="It applies your speaker selection, volume, custom chime, and cooldown." data-de="Sie verwendet Geräteauswahl, Lautstärke, Klingelton und Sperrzeit.">It applies your speaker selection, volume, custom chime, and cooldown.</p></article>
+            <article class="process-card reveal"><span class="process-index">02</span><div class="process-visual bridge-visual"><img src="assets/logo.png" alt=""><span></span><span></span></div><h3 data-en="The bridge takes over" data-de="Die Bridge übernimmt">The bridge takes over</h3><p data-en="It applies the configured speaker selection, volume, custom chime, and cooldown." data-de="Sie verwendet Geräteauswahl, Lautstärke, Klingelton und Sperrzeit.">It applies the configured speaker selection, volume, custom chime, and cooldown.</p></article>
             <span class="process-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
             <article class="process-card reveal"><span class="process-index">03</span><div class="process-visual pods-visual"><i></i><i></i><i></i></div><h3 data-en="OwnTone plays in sync" data-de="OwnTone spielt synchron ab">OwnTone plays in sync</h3><p data-en="The chime plays across the selected AirPlay speakers, then their prior state is restored." data-de="Der Ton läuft auf den gewählten AirPlay-Geräten; anschließend wird ihr vorheriger Zustand wiederhergestellt.">The chime plays across the selected AirPlay speakers, then their prior state is restored.</p></article>
           </div>
@@ -194,7 +300,7 @@
         <div class="install-panel reveal">
           <div class="install-intro">
             <span class="section-kicker" data-en="READY WHEN YOU ARE" data-de="BEREIT, WENN DU ES BIST">READY WHEN YOU ARE</span>
-            <h2 data-en="Pick your way in." data-de="Wähle deine Installation.">Pick your way in.</h2>
+            <h2 data-en="Choose an installation path." data-de="Wähle deine Installation.">Choose an installation path.</h2>
             <p data-en="Use the guided Runtipi experience or run the same container with Docker Compose. Both keep everything on your server." data-de="Nutze die geführte Installation in Runtipi oder starte denselben Container mit Docker Compose. Beides bleibt auf deinem Server.">Use the guided Runtipi experience or run the same container with Docker Compose. Both keep everything on your server.</p>
             <div class="requirements"><span data-en="Before you start" data-de="Bevor du startest">Before you start</span><ul><li data-en="Ring account with a configured doorbell" data-de="Ring-Konto mit eingerichteter Doorbell">Ring account with a configured doorbell</li><li data-en="HomePods and server on the same network" data-de="HomePods und Server im selben Netzwerk">HomePods and server on the same network</li><li data-en="Apple Home speaker access enabled" data-de="Lautsprecherzugriff in Apple Home aktiviert">Apple Home speaker access enabled</li></ul></div>
           </div>
@@ -221,7 +327,7 @@
 
       <section class="section privacy-section shell reveal">
         <div class="privacy-visual"><span class="shield"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.5 7 10 4.2-1.5 7-5.5 7-10V6l-7-3Z"/><path d="m9.5 12 1.7 1.7 3.6-4"/></svg></span><i></i><i></i><i></i></div>
-        <div><span class="section-kicker" data-en="LOCAL-FIRST, FOR REAL" data-de="ECHT LOCAL-FIRST">LOCAL-FIRST, FOR REAL</span><h2 data-en="Your home data stays at home." data-de="Deine Smart-Home-Daten bleiben zuhause.">Your home data stays at home.</h2><p data-en="Ring HomePod Doorbell runs on your own hardware. Chimes and settings never pass through our servers because there are no servers of ours to pass through." data-de="Ring HomePod Doorbell läuft auf deiner eigenen Hardware. Klingeltöne und Einstellungen passieren niemals unsere Server – denn es gibt keine Server von uns.">Ring HomePod Doorbell runs on your own hardware. Chimes and settings never pass through our servers because there are no servers of ours to pass through.</p><div class="privacy-points"><span><i></i><span data-en="No account with us" data-de="Kein Konto bei uns">No account with us</span></span><span><i></i><span data-en="No analytics" data-de="Keine Analyse">No analytics</span></span><span><i></i><span data-en="No advertising" data-de="Keine Werbung">No advertising</span></span></div></div>
+        <div><span class="section-kicker" data-en="LOCAL-FIRST, FOR REAL" data-de="ECHT LOCAL-FIRST">LOCAL-FIRST, FOR REAL</span><h2 data-en="Smart-home data stays at home." data-de="Deine Smart-Home-Daten bleiben zuhause.">Smart-home data stays at home.</h2><p data-en="Ring HomePod Doorbell runs on hardware you control. Chimes and settings never pass through our servers because there are no servers of ours to pass through." data-de="Ring HomePod Doorbell läuft auf deiner eigenen Hardware. Klingeltöne und Einstellungen passieren niemals unsere Server – denn es gibt keine Server von uns.">Ring HomePod Doorbell runs on hardware you control. Chimes and settings never pass through our servers because there are no servers of ours to pass through.</p><div class="privacy-points"><span><i></i><span data-en="No account with us" data-de="Kein Konto bei uns">No account with us</span></span><span><i></i><span data-en="No analytics" data-de="Keine Analyse">No analytics</span></span><span><i></i><span data-en="No advertising" data-de="Keine Werbung">No advertising</span></span></div></div>
       </section>
 
       <section id="faq" class="section faq-section shell">
@@ -239,7 +345,7 @@
         <div class="cta-orbit one"></div><div class="cta-orbit two"></div>
         <img src="assets/logo.png" alt="" class="cta-logo">
         <span class="section-kicker" data-en="MAKE THE DOORBELL YOURS" data-de="MACH DIE KLINGEL ZU DEINER">MAKE THE DOORBELL YOURS</span>
-        <h2 data-en="Let your home sound like home." data-de="Lass dein Zuhause nach Zuhause klingen.">Let your home sound like home.</h2>
+        <h2 data-en="Make every ring feel at home." data-de="Lass jedes Klingeln nach Zuhause klingen.">Make every ring feel at home.</h2>
         <p data-en="Free, open source, and ready for your Runtipi or Docker server." data-de="Kostenlos, Open Source und bereit für deinen Runtipi- oder Docker-Server.">Free, open source, and ready for your Runtipi or Docker server.</p>
         <div class="hero-actions centered-actions"><a class="button button-primary" href="https://github.com/alexholzreiter/ring-homepod-doorbell" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4M8 19c-3 .9-3-1.5-4-2"/></svg><span data-en="Get it on GitHub" data-de="Jetzt auf GitHub">Get it on GitHub</span></a><a class="button button-secondary light-button" href="#install"><span data-en="Installation options" data-de="Installationsoptionen">Installation options</span></a></div>
       </section>
@@ -247,7 +353,7 @@
 
     <footer class="footer shell">
       <div class="footer-brand"><span class="brand-mark small"><img src="assets/logo.png" alt=""></span><span><strong>Ring HomePod Doorbell</strong><small data-en="Independent open-source project" data-de="Unabhängiges Open-Source-Projekt">Independent open-source project</small></span></div>
-      <div class="footer-links"><a href="https://github.com/alexholzreiter/ring-homepod-doorbell" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/alexholzreiter/ring-homepod-doorbell/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" data-en="MIT License" data-de="MIT-Lizenz">MIT License</a><a href="https://github.com/alexholzreiter/ring-homepod-doorbell/issues" target="_blank" rel="noopener noreferrer" data-en="Issues" data-de="Probleme melden">Issues</a><a href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04" target="_blank" rel="noopener noreferrer" data-en="Tip a coffee" data-de="Auf einen Kaffee">Tip a coffee</a></div>
+      <div class="footer-links"><a href="about/" data-en="About" data-de="Über das Projekt">About</a><a href="feed.xml">RSS</a><a href="https://github.com/alexholzreiter/ring-homepod-doorbell" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/alexholzreiter/ring-homepod-doorbell/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" data-en="MIT License" data-de="MIT-Lizenz">MIT License</a><a href="https://github.com/alexholzreiter/ring-homepod-doorbell/issues" target="_blank" rel="noopener noreferrer" data-en="Issues" data-de="Probleme melden">Issues</a><a href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04" target="_blank" rel="noopener noreferrer" data-en="Tip a coffee" data-de="Auf einen Kaffee">Tip a coffee</a></div>
       <p>© <span id="year">2026</span> Alexander Holzreiter · <span data-en="Not affiliated with Ring or Apple." data-de="Nicht mit Ring oder Apple verbunden.">Not affiliated with Ring or Apple.</span></p>
     </footer>
   </body>

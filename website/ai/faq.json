@@ -1,0 +1,26 @@
+{
+  "name": "Ring HomePod Doorbell FAQs",
+  "canonicalUrl": "https://doorbell.klickwerk.digital/#faq",
+  "items": [
+    {
+      "question": "Does it work with HomePod mini?",
+      "answer": "Yes. OwnTone discovers HomePod and HomePod mini models as AirPlay 2 outputs. They must be reachable from the server on the same network or through correctly routed mDNS."
+    },
+    {
+      "question": "Can I choose individual speakers?",
+      "answer": "Yes. Select any combination of discovered AirPlay speakers or automatically include every available output. Volume is configurable as well."
+    },
+    {
+      "question": "Will it interrupt music?",
+      "answer": "It can. OwnTone temporarily takes over the selected AirPlay outputs for the duration of the chime and restores its previous output selection and volume afterward."
+    },
+    {
+      "question": "Do I need HomeKit?",
+      "answer": "No. The custom chime works through Ring and OwnTone. An optional virtual HomeKit doorbell can be enabled separately for Apple's standard chime."
+    },
+    {
+      "question": "Is this an official Ring or Apple product?",
+      "answer": "No. It is an independent open-source project. The Ring connection uses an unofficial API, so future changes by Ring may require an app update."
+    }
+  ]
+}

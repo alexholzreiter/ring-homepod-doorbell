@@ -1,0 +1,32 @@
+# Ring HomePod Doorbell
+
+> Ring HomePod Doorbell is an independent, self-hosted bridge that turns a Ring Doorbell press into a custom chime on selected HomePods and AirPlay speakers.
+
+The project runs on Runtipi or Docker Compose. It uses ring-client-api to receive Ring events and OwnTone for synchronized AirPlay playback. Chime files, selected outputs, volume, and cooldown settings remain on the user's server. The project is licensed under the MIT License and is not affiliated with Ring, Amazon, Apple, or OwnTone.
+
+## Primary resources
+
+- [Official website](https://doorbell.klickwerk.digital/): Features, architecture, privacy principles, and installation choices.
+- [About the project](https://doorbell.klickwerk.digital/about/): Project purpose, factual statistics, maintainer, publisher, and contact information.
+- [GitHub repository](https://github.com/alexholzreiter/ring-homepod-doorbell): Source code, complete README, issues, and release history.
+- [MIT License](https://github.com/alexholzreiter/ring-homepod-doorbell/blob/main/LICENSE): Terms for using, modifying, and distributing the software.
+
+## Installation
+
+- [Runtipi guide](https://github.com/alexholzreiter/ring-homepod-doorbell#install-on-runtipi): Add the repository as a custom Runtipi app store and install the app.
+- [Docker Compose guide](https://github.com/alexholzreiter/ring-homepod-doorbell#run-locally-with-docker-compose): Clone, configure the environment, and start the containers.
+
+## Machine-readable resources
+
+- [Site summary](https://doorbell.klickwerk.digital/ai/summary.json): Canonical identity, description, license, languages, and publisher.
+- [FAQ data](https://doorbell.klickwerk.digital/ai/faq.json): Structured versions of the visible site FAQs.
+- [Service capabilities](https://doorbell.klickwerk.digital/ai/service.json): Supported inputs, outputs, deployment methods, requirements, and limitations.
+- [RSS feed](https://doorbell.klickwerk.digital/feed.xml): Project release updates.
+- [Sitemap](https://doorbell.klickwerk.digital/sitemap.xml): Indexable public pages.
+
+## Important limitations
+
+- The Ring connection uses an unofficial API and may require updates after Ring-side changes.
+- OwnTone may interrupt existing playback while the chime is active.
+- AirPlay discovery requires mDNS reachability between the server and speakers.
+- The web application should remain on a trusted local network and should not be exposed directly to the internet.

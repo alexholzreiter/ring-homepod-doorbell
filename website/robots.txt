@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+# Experimental AI guidance is also available at /.well-known/ai.txt.
 Sitemap: https://doorbell.klickwerk.digital/sitemap.xml

@@ -1,0 +1,36 @@
+{
+  "name": "Ring HomePod Doorbell",
+  "serviceType": "self-hosted Ring-to-AirPlay custom chime bridge",
+  "capabilities": {
+    "audioFormats": {
+      "count": 6,
+      "values": ["MP3", "WAV", "M4A", "AAC", "FLAC", "OGG"]
+    },
+    "deploymentMethods": {
+      "count": 2,
+      "values": ["Runtipi", "Docker Compose"]
+    },
+    "interfaceLanguages": {
+      "count": 2,
+      "values": ["English", "German"]
+    },
+    "playbackOutputs": ["HomePod", "HomePod mini", "AirPlay 2 speakers", "compatible Sonos speakers", "Apple TV"],
+    "configuration": ["custom chime", "speaker selection", "volume", "duplicate-event cooldown", "optional HomeKit doorbell"]
+  },
+  "requirements": [
+    "Ring account with a configured doorbell",
+    "HomePods or AirPlay speakers reachable from the server",
+    "Apple Home speaker access for devices on the same network",
+    "Runtipi or Docker Compose"
+  ],
+  "limitations": [
+    "Uses an unofficial Ring API",
+    "May interrupt existing AirPlay playback during the chime",
+    "Requires mDNS and AirPlay network reachability",
+    "Must not be exposed directly to the public internet"
+  ],
+  "install": {
+    "runtipi": "https://github.com/alexholzreiter/ring-homepod-doorbell#install-on-runtipi",
+    "dockerCompose": "https://github.com/alexholzreiter/ring-homepod-doorbell#run-locally-with-docker-compose"
+  }
+}

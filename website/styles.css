@@ -228,11 +228,31 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .light-button { border-color: #3a3b46; background: transparent; color: #d8d7de; }
 .light-button:hover { background: #242530; }
 
+.about-hero { min-height: 500px; display: grid; grid-template-columns: minmax(0,1fr) 260px; align-items: center; gap: 90px; border-radius: 32px; background: #181923; color: #fff; margin-top: 28px; padding: 68px 78px; }
+.about-hero h1 { max-width: 760px; margin: 22px 0 18px; font: 800 clamp(48px,6vw,73px)/.98 "Avenir Next",Inter,sans-serif; letter-spacing: -.065em; }
+.about-hero p { max-width: 690px; margin: 0; color: #aaa9b4; font-size: 14px; line-height: 1.75; }
+.about-hero > img { width: 220px; border-radius: 58px; box-shadow: 0 28px 70px rgba(235,73,31,.32); }
+.about-content { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(360px,.9fr); gap: 75px; padding-block: 105px; }
+.about-story h2,.publisher-section h2 { margin: 10px 0 18px; font: 800 clamp(36px,4vw,53px)/1.05 "Avenir Next",Inter,sans-serif; letter-spacing: -.055em; }
+.about-story > p,.publisher-copy > p { color: var(--muted); font-size: 13px; line-height: 1.8; }
+.about-actions { display: flex; gap: 10px; margin-top: 28px; }
+.facts-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.facts-grid article { min-height: 155px; display: flex; justify-content: center; flex-direction: column; border: 1px solid var(--line); border-radius: 22px; background: var(--paper); box-shadow: var(--shadow); padding: 24px; }
+.facts-grid strong { color: var(--orange); font: 800 34px/1 "Avenir Next",Inter,sans-serif; letter-spacing: -.04em; }
+.facts-grid span { margin-top: 8px; color: #74747d; font-size: 10px; line-height: 1.45; }
+.publisher-section { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(320px,.8fr); align-items: center; gap: 70px; border-block: 1px solid var(--line); padding-block: 95px; }
+.independence-note { border-left: 3px solid var(--orange); padding-left: 15px; }
+.publisher-card { display: grid; gap: 7px; border: 1px solid var(--line); border-radius: 23px; background: var(--paper); box-shadow: var(--shadow); padding: 28px; font-style: normal; }
+.publisher-card strong { margin-bottom: 6px; font: 800 22px/1 "Avenir Next",Inter,sans-serif; }
+.publisher-card span { color: #777780; font-size: 11px; }
+.publisher-card a { color: var(--orange-dark); font-size: 11px; font-weight: 700; text-decoration: none; }
+.publisher-card a:last-child { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 14px; }
+
 .footer { min-height: 130px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 20px; }
 .footer-brand { display: flex; align-items: center; gap: 10px; }
 .footer-brand > span:last-child { display: grid; }
 .brand-mark.small { width: 34px; height: 34px; flex-basis: 34px; border-radius: 11px; }
-.footer-links { display: flex; align-items: center; gap: 22px; }
+.footer-links { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 22px; }
 .footer-links a { color: #686870; font-size: 9px; font-weight: 700; text-decoration: none; }
 .footer-links a:hover { color: var(--orange-dark); }
 .footer > p { grid-column: 1 / -1; border-top: 1px solid var(--line); margin: 0; color: #9d9ca2; padding-top: 17px; font-size: 8px; }
@@ -279,6 +299,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   .showcase-copy { max-width: 640px; }
   .install-panel { grid-template-columns: 1fr; }
   .privacy-section { grid-template-columns: .72fr 1.28fr; gap: 35px; }
+  .about-hero { grid-template-columns: 1fr 180px; gap: 45px; padding: 55px; }
+  .about-hero > img { width: 170px; border-radius: 46px; }
+  .about-content { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 620px) {
@@ -319,6 +342,14 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
   .privacy-visual > i:nth-of-type(3) { width: 240px; height: 240px; }
   .faq-list summary { font-size: 13px; }
   .final-cta { width: 100%; border-radius: 0; }
+  .about-hero { width: 100%; grid-template-columns: 1fr; border-radius: 0; margin-top: 0; padding: 55px 22px; text-align: center; }
+  .about-hero > img { width: 130px; grid-row: 1; margin-inline: auto; border-radius: 37px; }
+  .about-content { gap: 50px; }
+  .facts-grid { grid-template-columns: 1fr 1fr; }
+  .facts-grid article { min-height: 135px; padding: 18px; }
+  .publisher-section { grid-template-columns: 1fr; gap: 35px; }
+  .about-actions { align-items: stretch; flex-direction: column; }
+  .about-actions .button { width: 100%; }
   .footer { grid-template-columns: 1fr; padding-block: 30px; }
   .footer-links { justify-content: flex-start; }
   .footer > p { grid-column: auto; }

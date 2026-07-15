@@ -28,11 +28,23 @@ function setLanguage(language) {
     button.setAttribute("aria-label", button.dataset[`${nextLanguage}Label`]);
   });
 
+  updateMenuLabel();
+
   try {
     localStorage.setItem(storageKey, nextLanguage);
   } catch {
     // The language switch remains usable when storage is unavailable.
   }
+}
+
+function updateMenuLabel() {
+  const button = document.querySelector(".menu-button");
+  if (!button) return;
+  const expanded = button.getAttribute("aria-expanded") === "true";
+  const label = root.lang === "de"
+    ? (expanded ? "Menü schließen" : "Menü öffnen")
+    : (expanded ? "Close menu" : "Open menu");
+  button.setAttribute("aria-label", label);
 }
 
 let initialLanguage = "en";
@@ -51,11 +63,13 @@ menuButton?.addEventListener("click", () => {
   const expanded = menuButton.getAttribute("aria-expanded") === "true";
   menuButton.setAttribute("aria-expanded", String(!expanded));
   navLinks.classList.toggle("open", !expanded);
+  updateMenuLabel();
 });
 
 navLinks?.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
   menuButton?.setAttribute("aria-expanded", "false");
   navLinks.classList.remove("open");
+  updateMenuLabel();
 }));
 
 const installTabs = [...document.querySelectorAll("[data-install-tab]")];

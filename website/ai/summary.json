@@ -1,0 +1,20 @@
+{
+  "name": "Ring HomePod Doorbell",
+  "canonicalUrl": "https://doorbell.klickwerk.digital/",
+  "description": "A self-hosted bridge that plays a custom Ring Doorbell chime on selected HomePods and AirPlay speakers.",
+  "category": "self-hosted smart-home automation",
+  "languages": ["en", "de"],
+  "license": "MIT",
+  "sourceCode": "https://github.com/alexholzreiter/ring-homepod-doorbell",
+  "documentation": "https://github.com/alexholzreiter/ring-homepod-doorbell#readme",
+  "publisher": {
+    "name": "klickwerk",
+    "url": "https://klickwerk.digital/"
+  },
+  "maintainer": {
+    "name": "Alexander Holzreiter",
+    "url": "https://github.com/alexholzreiter"
+  },
+  "independence": "Independent project; not affiliated with Ring, Amazon, Apple, or OwnTone.",
+  "updated": "2026-07-15"
+}

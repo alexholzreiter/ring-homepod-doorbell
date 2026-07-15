@@ -1,0 +1,13 @@
+# Experimental AI crawler guidance for Ring HomePod Doorbell
+# This file is informational. robots.txt remains the authoritative crawler policy.
+
+Site: https://doorbell.klickwerk.digital/
+Allow: /
+Disallow: none
+Attribution-Name: Ring HomePod Doorbell
+Attribution-URL: https://doorbell.klickwerk.digital/
+Source-Code: https://github.com/alexholzreiter/ring-homepod-doorbell
+License: MIT
+LLM-Documentation: https://doorbell.klickwerk.digital/llms.txt
+Machine-Readable-Summary: https://doorbell.klickwerk.digital/ai/summary.json
+Contact: https://doorbell.klickwerk.digital/about/
