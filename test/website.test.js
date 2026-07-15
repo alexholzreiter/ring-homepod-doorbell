@@ -16,7 +16,7 @@ test("marketing website has the expected domain and deployment workflow", async 
   assert.match(html, /<link rel="canonical" href="https:\/\/doorbell\.klickwerk\.digital\/">/);
   assert.match(sitemap, /https:\/\/doorbell\.klickwerk\.digital\//);
   assert.match(workflow, /actions\/configure-pages@v5/);
-  assert.match(workflow, /actions\/upload-pages-artifact@v4/);
+  assert.match(workflow, /actions\/upload-pages-artifact@v5/);
   assert.match(workflow, /actions\/deploy-pages@v4/);
   assert.match(workflow, /path: website/);
   assert.match(workflow, /include-hidden-files: true/);
