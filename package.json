@@ -1,6 +1,6 @@
 {
   "name": "ring-homepod-doorbell",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "private": true,
   "type": "module",
   "description": "Plays a custom Ring doorbell chime on HomePods via OwnTone/AirPlay.",
@@ -8,6 +8,8 @@
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
+    "postinstall": "node scripts/patch-push-receiver.mjs",
+    "pretest": "node scripts/patch-push-receiver.mjs",
     "start": "node src/index.js",
     "test": "node --test"
   },

@@ -3,6 +3,7 @@ FROM node:22-bookworm-slim
 WORKDIR /app
 
 COPY package*.json ./
+COPY scripts ./scripts
 RUN npm ci --omit=dev
 
 COPY src ./src

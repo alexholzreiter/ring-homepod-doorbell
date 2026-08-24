@@ -26,6 +26,24 @@ test("Runtipi standalone package and app-store package stay identical", () => {
   }
 });
 
+test("application and Runtipi package versions stay synchronized", () => {
+  const packageVersion = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")).version;
+  const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
+  const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
+
+  assert.equal(config.version, packageVersion);
+  assert.match(compose, new RegExp(`ring-homepod-doorbell:${packageVersion.replaceAll(".", "\\.")}`));
+});
+
+test("Docker image applies the Ring push header compatibility patch", () => {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+  const dockerfile = fs.readFileSync(path.join(root, "Dockerfile"), "utf8");
+
+  assert.equal(packageJson.scripts.postinstall, "node scripts/patch-push-receiver.mjs");
+  assert.match(dockerfile, /COPY scripts \.\/scripts/);
+  assert.match(dockerfile, /RUN npm ci --omit=dev/);
+});
+
 test("Runtipi text fields define valid length limits", () => {
   const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
   const stringFields = config.form_fields.filter(({ type }) => type === "text" || type === "password");
