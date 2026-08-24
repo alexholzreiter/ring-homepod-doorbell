@@ -123,8 +123,10 @@ function renderOutputs(outputs, settings) {
   }
 
   for (const output of outputs) {
+    const requiresApproval = Boolean(output.needs_auth_key || output.requires_auth);
     const row = document.createElement("div");
     row.className = "output-row";
+    row.classList.toggle("is-unavailable", requiresApproval);
     const label = document.createElement("label");
     const icon = document.createElement("span");
     icon.className = "speaker-icon";
@@ -133,8 +135,11 @@ function renderOutputs(outputs, settings) {
     checkbox.type = "checkbox";
     checkbox.value = String(output.id);
     checkbox.className = "output-checkbox";
-    checkbox.checked = settings.useAllOutputs || settings.selectedOutputIds.includes(String(output.id));
-    checkbox.disabled = settings.useAllOutputs;
+    checkbox.checked =
+      !requiresApproval &&
+      (settings.useAllOutputs || settings.selectedOutputIds.includes(String(output.id)));
+    checkbox.disabled = requiresApproval || settings.useAllOutputs;
+    checkbox.dataset.requiresApproval = String(requiresApproval);
     const text = document.createElement("span");
     text.className = "output-copy";
     const name = document.createElement("strong");
@@ -147,7 +152,7 @@ function renderOutputs(outputs, settings) {
     check.append(checkbox, document.createElement("i"));
     label.append(icon, text, check);
     row.append(label);
-    if (output.needs_auth_key || output.requires_auth) {
+    if (requiresApproval) {
       const auth = document.createElement("small");
       auth.className = "auth-badge";
       auth.textContent = t("authRequired");
@@ -216,8 +221,9 @@ elements.chimeFile.addEventListener("change", () => {
 elements.useAll.addEventListener("change", () => {
   markFormDirty();
   document.querySelectorAll(".output-checkbox").forEach((checkbox) => {
-    checkbox.disabled = elements.useAll.checked;
-    if (elements.useAll.checked) checkbox.checked = true;
+    const requiresApproval = checkbox.dataset.requiresApproval === "true";
+    checkbox.disabled = requiresApproval || elements.useAll.checked;
+    if (elements.useAll.checked) checkbox.checked = !requiresApproval;
   });
 });
 

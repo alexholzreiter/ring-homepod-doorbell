@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "../src/owntone-client.js";
+import {
+  isAirPlayOutput,
+  isReadyAirPlayOutput,
+  OwnToneClient,
+  selectOutputIds,
+} from "../src/owntone-client.js";
 
 function jsonResponse(value, status = 200) {
   return new Response(JSON.stringify(value), {
@@ -29,6 +34,27 @@ test("isAirPlayOutput accepts OwnTone AirPlay and AirPlay 2 types", () => {
   assert.equal(isAirPlayOutput({ type: "AirPlay" }), true);
   assert.equal(isAirPlayOutput({ type: "AirPlay 2" }), true);
   assert.equal(isAirPlayOutput({ type: "ALSA" }), false);
+});
+
+test("authorization-required AirPlay outputs cannot block ready speakers", () => {
+  const outputs = [
+    { id: "office", type: "AirPlay 2", requires_auth: false, needs_auth_key: false },
+    { id: "locked-mac", type: "AirPlay 2", requires_auth: true, needs_auth_key: true },
+  ];
+
+  assert.equal(isReadyAirPlayOutput(outputs[0]), true);
+  assert.equal(isReadyAirPlayOutput(outputs[1]), false);
+  assert.deepEqual(
+    selectOutputIds(outputs, {
+      useAllOutputs: false,
+      selectedOutputIds: ["office", "locked-mac"],
+    }),
+    ["office"]
+  );
+  assert.deepEqual(
+    selectOutputIds(outputs, { useAllOutputs: true, selectedOutputIds: [] }),
+    ["office"]
+  );
 });
 
 test("findTrack resolves the exact shared media path", async () => {

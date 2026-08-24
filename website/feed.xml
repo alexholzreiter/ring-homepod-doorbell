@@ -5,8 +5,15 @@
     <link>https://doorbell.klickwerk.digital/</link>
     <description>Release updates for the self-hosted Ring-to-AirPlay custom chime bridge.</description>
     <language>en</language>
-    <lastBuildDate>Mon, 24 Aug 2026 17:24:52 +0200</lastBuildDate>
+    <lastBuildDate>Mon, 24 Aug 2026 17:36:04 +0200</lastBuildDate>
     <atom:link href="https://doorbell.klickwerk.digital/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ring HomePod Doorbell 0.2.14</title>
+      <link>https://github.com/alexholzreiter/ring-homepod-doorbell/releases/tag/v0.2.14</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/ring-homepod-doorbell/releases/tag/v0.2.14</guid>
+      <pubDate>Mon, 24 Aug 2026 17:36:04 +0200</pubDate>
+      <description>Version 0.2.14 skips AirPlay receivers that currently require authorization, so one unavailable device can no longer prevent playback on ready HomePods.</description>
+    </item>
     <item>
       <title>Ring HomePod Doorbell 0.2.13</title>
       <link>https://github.com/alexholzreiter/ring-homepod-doorbell/releases/tag/v0.2.13</link>

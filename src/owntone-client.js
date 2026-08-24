@@ -122,8 +122,12 @@ export function isAirPlayOutput(output) {
   return /^airplay(?:\s+\d+)?$/i.test(String(output?.type ?? "").trim());
 }
 
+export function isReadyAirPlayOutput(output) {
+  return isAirPlayOutput(output) && !output?.requires_auth && !output?.needs_auth_key;
+}
+
 export function selectOutputIds(outputs, settings) {
-  const airPlayOutputs = outputs.filter(isAirPlayOutput);
+  const airPlayOutputs = outputs.filter(isReadyAirPlayOutput);
   const requested = settings.useAllOutputs
     ? airPlayOutputs.map((output) => String(output.id))
     : settings.selectedOutputIds.map(String);

@@ -153,6 +153,9 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .output-row:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(44,39,30,.06); }
 .output-row:has(input:checked) { border-color: #a799f2; background: #fbfaff; }
 .output-row > label { min-width: 0; display: grid; grid-template-columns: 34px minmax(0, 1fr) 18px; align-items: center; gap: 10px; padding: 11px; cursor: pointer; }
+.output-row.is-unavailable { background: #f8f7f4; opacity: .68; }
+.output-row.is-unavailable:hover { transform: none; box-shadow: none; }
+.output-row.is-unavailable > label { cursor: not-allowed; }
 .speaker-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 11px; background: #f0edff; color: var(--violet); }
 .speaker-icon svg { width: 18px; height: 18px; }
 .output-copy { min-width: 0; display: grid; }

@@ -14,3 +14,11 @@ test("website and README link to the configured Stripe payment page", () => {
   assert.match(html, /target="_blank" rel="noopener noreferrer"/);
   assert.match(readme, new RegExp(`\(${stripePaymentLink}\)`));
 });
+
+test("authorization-required AirPlay outputs are disabled in the setup form", () => {
+  const app = fs.readFileSync(path.join(root, "src", "public", "app.js"), "utf8");
+
+  assert.match(app, /output\.needs_auth_key \|\| output\.requires_auth/);
+  assert.match(app, /checkbox\.disabled = requiresApproval \|\| settings\.useAllOutputs/);
+  assert.match(app, /checkbox\.checked = !requiresApproval/);
+});
