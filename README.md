@@ -59,6 +59,11 @@ npx -p ring-client-api ring-auth-cli
 
 The token is a secret and must never be committed to Git.
 
+If Ring later rejects the token, generate a new one and replace the
+`RING_REFRESH_TOKEN` value in Runtipi. From version 0.2.15 onward, the app
+detects the changed Runtipi value, safely replaces an invalid token stored in
+the persistent data directory, and continues saving Ring's rotated tokens.
+
 ## Run locally with Docker Compose
 
 ```bash
@@ -103,9 +108,9 @@ The `runtipi/` directory contains the same app definition as a standalone,
 copyable package.
 
 The app uses the container image
-`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.14`. The workflow
+`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.15`. The workflow
 `.github/workflows/container.yml` publishes it for `amd64` and `arm64` when
-the Git tag `v0.2.14` is pushed.
+the Git tag `v0.2.15` is pushed.
 
 For every app release, `tipi_version` must also be incremented in both Runtipi
 `config.json` files. Runtipi uses this integer revision counter to offer

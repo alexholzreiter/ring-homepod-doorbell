@@ -14,6 +14,7 @@ import {
 import { RingApi } from "ring-client-api";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
+import { createTokenStore, isInvalidRefreshTokenError } from "./token-store.js";
 
 const DATA_DIR = process.env.DATA_DIR || "/data";
 const MEDIA_DIR = process.env.MEDIA_DIR || path.join(DATA_DIR, "media");
@@ -26,11 +27,11 @@ const HOMEKIT_PIN = process.env.HOMEKIT_PIN || "031-45-154";
 const HOMEKIT_USERNAME = process.env.HOMEKIT_USERNAME || "12:34:56:78:90:AB";
 const DEVICE_NAME = process.env.DEVICE_NAME || "Ring Haustür";
 const RING_CAMERA_NAME = (process.env.RING_CAMERA_NAME || "").trim();
-const TOKEN_FILE = path.join(DATA_DIR, "ring-refresh-token.txt");
 const ALLOWED_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "ogg", "wav"]);
 
 fs.mkdirSync(MEDIA_DIR, { recursive: true });
 const settingsStore = createSettingsStore(DATA_DIR);
+const tokenStore = createTokenStore(DATA_DIR, process.env.RING_REFRESH_TOKEN);
 let settings = settingsStore.read();
 const ownTone = new OwnToneClient(OWNTONE_URL, { mediaPath: OWNTONE_MEDIA_PATH });
 
@@ -48,6 +49,7 @@ const state = {
 
 let ringApi;
 let ringSubscription;
+let refreshTokenSubscription;
 let accessory;
 let doorbellService;
 let lastAcceptedRing = 0;
@@ -58,19 +60,8 @@ function errorMessage(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
-function readRefreshToken() {
-  if (fs.existsSync(TOKEN_FILE)) {
-    const stored = fs.readFileSync(TOKEN_FILE, "utf8").trim();
-    if (stored) return stored;
-  }
-  const envToken = (process.env.RING_REFRESH_TOKEN || "").trim();
-  if (!envToken) throw new Error("Kein Ring Refresh-Token vorhanden.");
-  fs.writeFileSync(TOKEN_FILE, envToken, { mode: 0o600 });
-  return envToken;
-}
-
 function saveRefreshToken(token) {
-  fs.writeFileSync(TOKEN_FILE, token, { mode: 0o600 });
+  tokenStore.save(token);
   console.log("Ring Refresh-Token wurde aktualisiert und gespeichert.");
 }
 
@@ -172,17 +163,20 @@ async function handleDoorbellPress(source) {
   }
 }
 
-async function startRing() {
-  try {
-    ringApi = new RingApi({
-      refreshToken: readRefreshToken(),
-      debug: process.env.DEBUG_RING === "true",
-      controlCenterDisplayName: "Ring HomePod Doorbell",
-    });
-    ringApi.onRefreshTokenUpdated.subscribe(({ newRefreshToken }) => {
+async function connectRing(candidate) {
+  const candidateApi = new RingApi({
+    refreshToken: candidate.token,
+    debug: process.env.DEBUG_RING === "true",
+    controlCenterDisplayName: "Ring HomePod Doorbell",
+  });
+  const candidateRefreshSubscription = candidateApi.onRefreshTokenUpdated.subscribe(
+    ({ newRefreshToken }) => {
       if (newRefreshToken) saveRefreshToken(newRefreshToken);
-    });
-    const cameras = await ringApi.getCameras();
+    }
+  );
+
+  try {
+    const cameras = await candidateApi.getCameras();
     const doorbells = cameras.filter((camera) => camera.isDoorbot);
     const candidates = doorbells.length ? doorbells : cameras;
     const camera = RING_CAMERA_NAME
@@ -197,6 +191,45 @@ async function startRing() {
           : "Im Ring-Konto wurde keine Kamera gefunden."
       );
     }
+    return { api: candidateApi, camera, refreshSubscription: candidateRefreshSubscription };
+  } catch (error) {
+    candidateRefreshSubscription.unsubscribe();
+    candidateApi.disconnect();
+    throw error;
+  }
+}
+
+async function startRing() {
+  try {
+    const storedTokenBeforeAttempt = tokenStore.currentStoredToken();
+    const candidates = tokenStore.candidates();
+    let connection;
+    let acceptedCandidate;
+    let lastError;
+
+    for (let index = 0; index < candidates.length; index += 1) {
+      const candidate = candidates[index];
+      try {
+        connection = await connectRing(candidate);
+        acceptedCandidate = candidate;
+        break;
+      } catch (error) {
+        lastError = error;
+        const canTryNext = isInvalidRefreshTokenError(error) && index < candidates.length - 1;
+        if (!canTryNext) throw error;
+        console.warn(
+          candidate.source === "stored"
+            ? "Gespeicherter Ring-Token ist ungültig; versuche den Token aus der Runtipi-Konfiguration."
+            : "Ring-Token aus der Runtipi-Konfiguration ist ungültig; versuche den zuletzt gespeicherten Token."
+        );
+      }
+    }
+
+    if (!connection || !acceptedCandidate) throw lastError;
+    tokenStore.accept(acceptedCandidate, storedTokenBeforeAttempt);
+    ringApi = connection.api;
+    refreshTokenSubscription = connection.refreshSubscription;
+    const { camera } = connection;
     state.ringCamera = camera.name;
     state.ringConnected = true;
     state.lastError = null;
@@ -341,6 +374,8 @@ void startRing();
 function shutdown(signal) {
   console.log(`${signal} empfangen, App wird beendet.`);
   ringSubscription?.unsubscribe?.();
+  refreshTokenSubscription?.unsubscribe?.();
+  ringApi?.disconnect?.();
   accessory?.unpublish();
   webServer.close(() => process.exit(0));
   setTimeout(() => process.exit(0), 2000).unref();
