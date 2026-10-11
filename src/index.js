@@ -14,6 +14,7 @@ import {
 import { RingApi } from "ring-client-api";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
+import { ensureSilenceFile } from "./silence.js";
 import { createTokenStore, isInvalidRefreshTokenError } from "./token-store.js";
 
 const DATA_DIR = process.env.DATA_DIR || "/data";
@@ -27,6 +28,10 @@ const HOMEKIT_PIN = process.env.HOMEKIT_PIN || "031-45-154";
 const HOMEKIT_USERNAME = process.env.HOMEKIT_USERNAME || "12:34:56:78:90:AB";
 const DEVICE_NAME = process.env.DEVICE_NAME || "Ring Haustür";
 const RING_CAMERA_NAME = (process.env.RING_CAMERA_NAME || "").trim();
+const LEAD_IN_FILENAME = "doorbell-lead-in.wav";
+const TAIL_FILENAME = "doorbell-tail.wav";
+const LEAD_IN_MS = Number(process.env.PLAYBACK_LEAD_IN_MS || 1500);
+const TAIL_MS = Number(process.env.PLAYBACK_TAIL_MS || 5000);
 const ALLOWED_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "ogg", "wav"]);
 
 fs.mkdirSync(MEDIA_DIR, { recursive: true });
@@ -114,6 +119,16 @@ async function getOwnToneOutputs() {
   }
 }
 
+async function ensurePadding() {
+  const leadInWritten = ensureSilenceFile(path.join(MEDIA_DIR, LEAD_IN_FILENAME), LEAD_IN_MS);
+  const tailWritten = ensureSilenceFile(path.join(MEDIA_DIR, TAIL_FILENAME), TAIL_MS);
+  if (leadInWritten || tailWritten) await ownTone.rescan();
+  return {
+    leadIn: await ownTone.findTrack(LEAD_IN_FILENAME),
+    tail: await ownTone.findTrack(TAIL_FILENAME),
+  };
+}
+
 async function playCustomChime() {
   if (state.playbackActive) {
     console.log("Klingelton läuft bereits; erneuter Start wird übersprungen.");
@@ -130,13 +145,23 @@ async function playCustomChime() {
     if (!outputIds.length) {
       throw new Error("Keine ausgewählten, erreichbaren AirPlay-Lautsprecher gefunden.");
     }
+    const paddingTracks = await ensurePadding();
     const track = await ownTone.findTrack(settings.chimeFilename);
-    await ownTone.playTrack(track, outputIds, settings.volume);
+    // AirPlay 2 receivers buffer several seconds before they output audio, and
+    // OwnTone tears the session down once the queue runs out. Surrounding the
+    // chime with silence keeps the session alive until it has been heard.
+    await ownTone.playTracks(
+      [paddingTracks.leadIn, track, paddingTracks.tail],
+      outputIds,
+      settings.volume
+    );
     state.lastPlaybackAt = new Date().toISOString();
     console.log(`Klingelton auf ${outputIds.length} AirPlay-Ausgang/Ausgängen gestartet.`);
 
     const playbackTime = Math.min(Math.max(Number(track.length_ms) || 5000, 1000), 60000);
-    await new Promise((resolve) => setTimeout(resolve, playbackTime + 1500));
+    await new Promise((resolve) =>
+      setTimeout(resolve, LEAD_IN_MS + playbackTime + TAIL_MS + 1500)
+    );
   } finally {
     state.playbackActive = false;
   }

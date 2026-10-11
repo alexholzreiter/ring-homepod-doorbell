@@ -73,7 +73,7 @@ test("findTrack resolves the exact shared media path", async () => {
   assert.equal(track.uri, "library:track:2");
 });
 
-test("playTrack selects outputs, sets volume and starts a clean queue", async () => {
+test("playTracks selects outputs, sets volume and starts a clean queue", async () => {
   const calls = [];
   let outputReads = 0;
   const client = new OwnToneClient("http://owntone", {
@@ -89,12 +89,13 @@ test("playTrack selects outputs, sets volume and starts a clean queue", async ()
           ],
         });
       }
+      if (url.includes("/api/queue/items/add")) return jsonResponse({ count: 1 });
       return new Response(null, { status: 204 });
     },
   });
 
-  await client.playTrack(
-    { uri: "library:track:7", length_ms: 1200 },
+  await client.playTracks(
+    [{ uri: "library:track:7", length_ms: 1200 }],
     ["pod"],
     65
   );
@@ -168,4 +169,41 @@ test("getOutputs retries while OwnTone is restarting", async () => {
 
   assert.deepEqual(await client.getOutputs(), [{ id: "office" }]);
   assert.equal(attempts, 3);
+});
+
+
+test("several tracks are queued in order with a single request", async () => {
+  const requests = [];
+  const client = new OwnToneClient("http://owntone.test", {
+    fetch: async (url, options) => {
+      requests.push({ method: options.method, url });
+      if (url.endsWith("/api/outputs")) {
+        return {
+          headers: { get: () => "application/json" },
+          ok: true,
+          status: 200,
+          json: async () => ({ outputs: [{ id: "kitchen", selected: true }] }),
+        };
+      }
+      if (url.includes("/api/queue/items/add")) {
+        return {
+          headers: { get: () => "application/json" },
+          ok: true,
+          status: 200,
+          json: async () => ({ count: 3 }),
+        };
+      }
+      return { headers: { get: () => "" }, ok: true, status: 204, text: async () => "" };
+    },
+  });
+
+  await client.playTracks(
+    [{ uri: "library:track:1" }, { uri: "library:track:2" }, { uri: "library:track:3" }],
+    ["kitchen"],
+    50
+  );
+
+  const added = new URL(requests.find((request) => request.url.includes("/api/queue/items/add")).url);
+  assert.equal(added.searchParams.get("uris"), "library:track:1,library:track:2,library:track:3");
+  assert.equal(added.searchParams.get("playback"), "start");
 });

@@ -140,7 +140,7 @@ export class OwnToneClient {
     return this.configureOutput(outputId, { pin });
   }
 
-  async playTrack(track, outputIds, volume) {
+  async playTracks(tracks, outputIds, volume) {
     const outputs = await this.getOutputs();
     const availableIds = new Set(outputs.map((output) => String(output.id)));
     const missingIds = outputIds.filter((id) => !availableIds.has(String(id)));
@@ -154,9 +154,12 @@ export class OwnToneClient {
     const query = new URLSearchParams({
       playback: "start",
       shuffle: "false",
-      uris: track.uri,
+      uris: tracks.map((track) => track.uri).join(","),
     });
-    await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
+    const queued = await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
+    if (queued?.count !== tracks.length) {
+      throw new Error("OwnTone hat den Klingelton nicht in die Warteschlange übernommen.");
+    }
   }
 }
 
