@@ -75,13 +75,16 @@ test("findTrack resolves the exact shared media path", async () => {
 
 test("playTrack selects outputs, sets volume and starts a clean queue", async () => {
   const calls = [];
+  let outputReads = 0;
   const client = new OwnToneClient("http://owntone", {
+    activationPollDelayMs: 0,
     fetch: async (url, options = {}) => {
       calls.push({ url, options });
       if (url.endsWith("/api/outputs")) {
+        outputReads += 1;
         return jsonResponse({
           outputs: [
-            { id: "pod", selected: false, volume: 21, type: "AirPlay" },
+            { id: "pod", selected: outputReads > 1, volume: 21, type: "AirPlay" },
             { id: "old", selected: true, volume: 44, type: "AirPlay" },
           ],
         });
@@ -105,6 +108,14 @@ test("prepareOutputs keeps the configured selection and volume", async () => {
   const client = new OwnToneClient("http://owntone", {
     fetch: async (url, options = {}) => {
       calls.push({ url, options });
+      if (url.endsWith("/api/outputs")) {
+        return jsonResponse({
+          outputs: [
+            { id: "one", selected: true },
+            { id: "two", selected: true },
+          ],
+        });
+      }
       return new Response(null, { status: 204 });
     },
   });
@@ -112,11 +123,36 @@ test("prepareOutputs keeps the configured selection and volume", async () => {
   await client.prepareOutputs(["one", "two"], 86);
 
   assert.match(calls[0].url, /\/api\/outputs\/set$/);
-  assert.match(calls[1].url, /\/api\/outputs\/one$/);
-  assert.match(calls[2].url, /\/api\/outputs\/two$/);
+  assert.match(calls[1].url, /\/api\/outputs$/);
+  assert.match(calls[2].url, /\/api\/outputs$/);
+  assert.match(calls[3].url, /\/api\/player\/volume\?/);
+  assert.match(calls[4].url, /\/api\/player\/volume\?/);
   assert.deepEqual(JSON.parse(calls[0].options.body), { outputs: ["one", "two"] });
-  assert.deepEqual(JSON.parse(calls[1].options.body), { selected: true, volume: 86 });
-  assert.deepEqual(JSON.parse(calls[2].options.body), { selected: true, volume: 86 });
+  assert.match(calls[3].url, /output_id=one/);
+  assert.match(calls[3].url, /volume=86/);
+});
+
+test("prepareOutputs toggles receivers that remain inactive after the bulk request", async () => {
+  const calls = [];
+  let outputReads = 0;
+  const client = new OwnToneClient("http://owntone", {
+    activationPollDelayMs: 0,
+    fetch: async (url, options = {}) => {
+      calls.push({ url, options });
+      if (url.endsWith("/api/outputs")) {
+        outputReads += 1;
+        return jsonResponse({
+          outputs: [{ id: "pod", selected: outputReads > 1 }],
+        });
+      }
+      return new Response(null, { status: 204 });
+    },
+  });
+
+  await client.prepareOutputs(["pod"], 64);
+
+  assert.ok(calls.some((call) => call.url.endsWith("/api/outputs/pod/toggle")));
+  assert.ok(calls.some((call) => call.url.includes("/api/player/volume?") && call.url.includes("volume=64")));
 });
 
 test("getOutputs retries while OwnTone is restarting", async () => {

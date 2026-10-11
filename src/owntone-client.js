@@ -9,6 +9,7 @@ export class OwnToneClient {
     this.baseUrl = baseUrl.replace(/\/$/, "");
     this.fetch = options.fetch ?? globalThis.fetch;
     this.mediaPath = options.mediaPath ?? "/srv/media";
+    this.activationPollDelayMs = options.activationPollDelayMs ?? 250;
     this.retryDelayMs = options.retryDelayMs ?? 1000;
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
@@ -87,11 +88,52 @@ export class OwnToneClient {
     });
   }
 
+  async setOutputVolume(outputId, volume) {
+    const query = new URLSearchParams({
+      output_id: String(outputId),
+      volume: String(volume),
+    });
+    await this.request(`/api/player/volume?${query}`, { method: "PUT" });
+  }
+
+  async toggleOutput(outputId) {
+    await this.request(`/api/outputs/${encodeURIComponent(outputId)}/toggle`, {
+      method: "PUT",
+    });
+  }
+
   async prepareOutputs(outputIds, volume) {
     await this.setOutputs(outputIds);
-    for (const id of outputIds) {
-      await this.configureOutput(id, { selected: true, volume });
+
+    // OwnTone can acknowledge the bulk request before an AirPlay receiver is
+    // actually active. Toggle only receivers that are still inactive, then
+    // verify the result before starting the chime.
+    const requested = new Set(outputIds.map(String));
+    const outputs = await this.getOutputs(1);
+    const inactiveIds = outputs
+      .filter((output) => requested.has(String(output.id)) && !output.selected)
+      .map((output) => String(output.id));
+    for (const id of inactiveIds) {
+      await this.toggleOutput(id);
     }
+
+    await this.waitForSelectedOutputs(outputIds);
+    for (const id of outputIds) {
+      await this.setOutputVolume(id, volume);
+    }
+  }
+
+  async waitForSelectedOutputs(outputIds, attempts = 24) {
+    const requested = new Set(outputIds.map(String));
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      const outputs = await this.getOutputs(1);
+      const selected = new Set(
+        outputs.filter((output) => output.selected).map((output) => String(output.id))
+      );
+      if ([...requested].every((id) => selected.has(id))) return outputs;
+      if (attempt < attempts - 1) await sleep(this.activationPollDelayMs);
+    }
+    throw new Error("OwnTone konnte die ausgewählten HomePods nicht aktivieren.");
   }
 
   async pairOutput(outputId, pin) {
