@@ -108,9 +108,9 @@ The `runtipi/` directory contains the same app definition as a standalone,
 copyable package.
 
 The app uses the container image
-`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.20`. The workflow
+`ghcr.io/alexholzreiter/ring-homepod-doorbell:0.2.21`. The workflow
 `.github/workflows/container.yml` publishes it for `amd64` and `arm64` when
-the Git tag `v0.2.20` is pushed.
+the Git tag `v0.2.21` is pushed.
 
 For every app release, `tipi_version` must also be incremented in both Runtipi
 `config.json` files. Runtipi uses this integer revision counter to offer

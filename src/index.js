@@ -15,6 +15,7 @@ import { PushNotificationAction, RingApi } from "ring-client-api";
 import { enableDebug, useLogger } from "ring-client-api/util";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
+import { createDingPoller } from "./ding-poller.js";
 import { ensureSilenceFile } from "./silence.js";
 import { createTokenStore, isInvalidRefreshTokenError } from "./token-store.js";
 
@@ -29,6 +30,7 @@ const HOMEKIT_PIN = process.env.HOMEKIT_PIN || "031-45-154";
 const HOMEKIT_USERNAME = process.env.HOMEKIT_USERNAME || "12:34:56:78:90:AB";
 const DEVICE_NAME = process.env.DEVICE_NAME || "Ring Haustür";
 const RING_CAMERA_NAME = (process.env.RING_CAMERA_NAME || "").trim();
+const RING_POLL_INTERVAL_MS = Number(process.env.RING_POLL_INTERVAL_MS || 4000);
 const LEAD_IN_FILENAME = "doorbell-lead-in.wav";
 const TAIL_FILENAME = "doorbell-tail.wav";
 const LEAD_IN_MS = Number(process.env.PLAYBACK_LEAD_IN_MS || 1500);
@@ -55,6 +57,7 @@ const state = {
 
 let ringApi;
 let ringSubscription;
+let dingPoller;
 let refreshTokenSubscription;
 let accessory;
 let doorbellService;
@@ -278,6 +281,16 @@ async function startRing() {
       console.log(`Ring-Benachrichtigung für "${camera.name}" empfangen: ${category}`);
       if (category === PushNotificationAction.Ding) void handleDoorbellPress("ring");
     });
+    dingPoller = createDingPoller({
+      fetchLatestDing: async () =>
+        (await camera.getEvents({ limit: 1, kind: "ding" }))?.events?.[0] ?? null,
+      onDing: () => {
+        console.log(`Klingeln von "${camera.name}" über den Ring-Verlauf erkannt.`);
+        void handleDoorbellPress("ring");
+      },
+      intervalMs: RING_POLL_INTERVAL_MS,
+    });
+    dingPoller.start();
     console.log(`Ring-Ereignislistener für "${camera.name}" ist aktiv.`);
   } catch (error) {
     state.ringConnected = false;
@@ -416,6 +429,7 @@ void startRing();
 function shutdown(signal) {
   console.log(`${signal} empfangen, App wird beendet.`);
   ringSubscription?.unsubscribe?.();
+  dingPoller?.stop();
   refreshTokenSubscription?.unsubscribe?.();
   ringApi?.disconnect?.();
   accessory?.unpublish();
