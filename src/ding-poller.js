@@ -56,3 +56,29 @@ export function createDingPoller({
     },
   };
 }
+
+// A press can arrive both as a push notification and through the event
+// history. Accept it once: by Ring ding id, and — in case the two paths report
+// different ids — by ignoring the other path for a short window.
+export function createDingDeduplicator({ windowMs = 30000, now = () => Date.now() } = {}) {
+  const seenIds = new Set();
+  let last = null;
+
+  return {
+    accept(id, source) {
+      const key = id == null ? null : String(id);
+      if (key && seenIds.has(key)) return false;
+      const time = now();
+      if (last && last.source !== source && time - last.time < windowMs) {
+        if (key) seenIds.add(key);
+        return false;
+      }
+      if (key) {
+        seenIds.add(key);
+        if (seenIds.size > 50) seenIds.delete(seenIds.values().next().value);
+      }
+      last = { source, time };
+      return true;
+    },
+  };
+}

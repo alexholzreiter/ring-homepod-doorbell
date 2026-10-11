@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDingPoller } from "../src/ding-poller.js";
+import { createDingDeduplicator, createDingPoller } from "../src/ding-poller.js";
 
 const quiet = { log() {}, warn() {} };
 
@@ -52,4 +52,31 @@ test("stale dings and fetch errors do not trigger", async () => {
   fail = true;
   await poller.poll();
   assert.deepEqual(dings, []);
+});
+
+test("a press reported by push and history is accepted once", () => {
+  let time = 0;
+  const dedupe = createDingDeduplicator({ now: () => time });
+  assert.equal(dedupe.accept("42", "push"), true);
+  time = 6000;
+  assert.equal(dedupe.accept("42", "history"), false);
+  assert.equal(dedupe.accept("42", "push"), false);
+});
+
+test("differing ids from the other path within the window are treated as the same press", () => {
+  let time = 0;
+  const dedupe = createDingDeduplicator({ now: () => time });
+  assert.equal(dedupe.accept("push-id", "push"), true);
+  time = 8000;
+  assert.equal(dedupe.accept("history-id", "history"), false);
+});
+
+test("later presses are accepted again", () => {
+  let time = 0;
+  const dedupe = createDingDeduplicator({ now: () => time });
+  assert.equal(dedupe.accept("1", "push"), true);
+  time = 10000;
+  assert.equal(dedupe.accept("2", "push"), true);
+  time = 60000;
+  assert.equal(dedupe.accept("3", "history"), true);
 });

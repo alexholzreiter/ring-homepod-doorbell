@@ -15,7 +15,7 @@ import { PushNotificationAction, RingApi } from "ring-client-api";
 import { enableDebug, useLogger } from "ring-client-api/util";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
-import { createDingPoller } from "./ding-poller.js";
+import { createDingDeduplicator, createDingPoller } from "./ding-poller.js";
 import { ensureSilenceFile } from "./silence.js";
 import { createTokenStore, isInvalidRefreshTokenError } from "./token-store.js";
 
@@ -58,6 +58,7 @@ const state = {
 let ringApi;
 let ringSubscription;
 let dingPoller;
+const dingDeduplicator = createDingDeduplicator();
 let refreshTokenSubscription;
 let accessory;
 let doorbellService;
@@ -279,12 +280,15 @@ async function startRing() {
     ringSubscription = camera.onNewNotification.subscribe((notification) => {
       const category = notification?.android_config?.category ?? "unbekannt";
       console.log(`Ring-Benachrichtigung für "${camera.name}" empfangen: ${category}`);
-      if (category === PushNotificationAction.Ding) void handleDoorbellPress("ring");
+      if (category !== PushNotificationAction.Ding) return;
+      if (!dingDeduplicator.accept(notification?.data?.event?.ding?.id, "push")) return;
+      void handleDoorbellPress("ring");
     });
     dingPoller = createDingPoller({
       fetchLatestDing: async () =>
         (await camera.getEvents({ limit: 1, kind: "ding" }))?.events?.[0] ?? null,
-      onDing: () => {
+      onDing: (event) => {
+        if (!dingDeduplicator.accept(event.ding_id_str ?? event.ding_id, "history")) return;
         console.log(`Klingeln von "${camera.name}" über den Ring-Verlauf erkannt.`);
         void handleDoorbellPress("ring");
       },
