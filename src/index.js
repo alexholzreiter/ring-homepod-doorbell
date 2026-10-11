@@ -11,7 +11,8 @@ import {
   Service,
   uuid,
 } from "@homebridge/hap-nodejs";
-import { RingApi } from "ring-client-api";
+import { PushNotificationAction, RingApi } from "ring-client-api";
+import { enableDebug, useLogger } from "ring-client-api/util";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
 import { ensureSilenceFile } from "./silence.js";
@@ -188,6 +189,20 @@ async function handleDoorbellPress(source) {
   }
 }
 
+// Without DEBUG_RING, still surface ring-client-api's push-notification
+// diagnostics (e.g. notifications in an unknown format) so missing doorbell
+// events can be traced from the container log.
+if (process.env.DEBUG_RING !== "true") {
+  enableDebug();
+  useLogger({
+    logInfo: (...message) => {
+      const text = message.join(" ");
+      if (/push notification/i.test(text)) console.log(`[ring] ${text.slice(0, 2000)}`);
+    },
+    logError: (message) => console.error("[ring]", message),
+  });
+}
+
 async function connectRing(candidate) {
   const candidateApi = new RingApi({
     refreshToken: candidate.token,
@@ -258,8 +273,10 @@ async function startRing() {
     state.ringCamera = camera.name;
     state.ringConnected = true;
     state.lastError = null;
-    ringSubscription = camera.onDoorbellPressed.subscribe(() => {
-      void handleDoorbellPress("ring");
+    ringSubscription = camera.onNewNotification.subscribe((notification) => {
+      const category = notification?.android_config?.category ?? "unbekannt";
+      console.log(`Ring-Benachrichtigung für "${camera.name}" empfangen: ${category}`);
+      if (category === PushNotificationAction.Ding) void handleDoorbellPress("ring");
     });
     console.log(`Ring-Ereignislistener für "${camera.name}" ist aktiv.`);
   } catch (error) {
