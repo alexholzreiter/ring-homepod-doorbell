@@ -86,7 +86,8 @@ Persistent data is stored in `data/`:
 ## Install on Runtipi
 
 This repository also serves as a custom Runtipi app store. In Runtipi, open
-**Settings → App Stores** and add this URL:
+**Settings → App Stores** and add this URL. Use **`doorbell`** as the store
+name if you also want to run [PostPush](https://github.com/alexholzreiter/postpush):
 
 ```text
 https://github.com/alexholzreiter/ring-homepod-doorbell
@@ -122,6 +123,20 @@ Runtipi can pull it without registry authentication.
 Runtipi must allow host networking. OwnTone requires it to discover HomePods
 through mDNS and establish AirPlay connections. The app is intentionally not
 exposable to the internet through Runtipi.
+
+### Shared OwnTone for PostPush
+
+[PostPush](https://github.com/alexholzreiter/postpush) (mailbox announcements on
+HomePods) does not start its own OwnTone on Runtipi and plays through this
+app's instance instead. HomePod OS 27 needs AirPlay 2 timing on the fixed PTP
+ports `319` and `320`, and only one OwnTone instance per host can hold them.
+
+PostPush connects to `http://127.0.0.1:3689` and writes its audio files, all
+starting with `postpush-`, into this app's `data/media` folder. It expects the
+folder at `app-data/doorbell/ring-homepod-doorbell`, so the store must be named
+`doorbell`. Stopping or reinstalling this app also stops PostPush
+announcements. A chime and an announcement share the player: if both are
+triggered at the same moment, the later one replaces the earlier one.
 
 ## Optional Apple HomeKit chime
 
