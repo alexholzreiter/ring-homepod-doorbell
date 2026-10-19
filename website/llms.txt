@@ -8,6 +8,7 @@ The project runs on Runtipi or Docker Compose. It uses ring-client-api to receiv
 
 - [Official website](https://doorbell.klickwerk.digital/): Features, architecture, privacy principles, and installation choices.
 - [About the project](https://doorbell.klickwerk.digital/about/): Project purpose, factual statistics, maintainer, publisher, and contact information.
+- [Legal notice](https://doorbell.klickwerk.digital/impressum/): Website operator, business information, supervisory authority, and media disclosure.
 - [GitHub repository](https://github.com/alexholzreiter/ring-homepod-doorbell): Source code, complete README, issues, and release history.
 - [MIT License](https://github.com/alexholzreiter/ring-homepod-doorbell/blob/main/LICENSE): Terms for using, modifying, and distributing the software.
 

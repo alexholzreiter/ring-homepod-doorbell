@@ -33,7 +33,11 @@ test("marketing website exposes clear GitHub, Runtipi, Docker, and support calls
 });
 
 test("every translated marketing string includes English and German", async () => {
-  const pages = await Promise.all([read("website/index.html"), read("website/about/index.html")]);
+  const pages = await Promise.all([
+    read("website/index.html"),
+    read("website/about/index.html"),
+    read("website/impressum/index.html"),
+  ]);
   const translatedElements = pages.flatMap((html) => html.match(/<[^>]+data-en="[^"]*"[^>]*>/g) || []);
 
   assert.ok(translatedElements.length > 60);
@@ -96,14 +100,15 @@ test("structured data describes the website, publisher, software, brand, and vis
   assert.doesNotMatch(html, /"@type": "SearchAction"/);
 });
 
-test("AI discovery files, project feed, and about page remain internally consistent", async () => {
-  const [llms, aiPolicy, summary, service, feed, about, sitemap, packageJson] = await Promise.all([
+test("AI discovery files, project feed, and public pages remain internally consistent", async () => {
+  const [llms, aiPolicy, summary, service, feed, about, legal, sitemap, packageJson] = await Promise.all([
     read("website/llms.txt"),
     read("website/.well-known/ai.txt"),
     read("website/ai/summary.json"),
     read("website/ai/service.json"),
     read("website/feed.xml"),
     read("website/about/index.html"),
+    read("website/impressum/index.html"),
     read("website/sitemap.xml"),
     read("package.json"),
   ]);
@@ -115,7 +120,11 @@ test("AI discovery files, project feed, and about page remain internally consist
   assert.equal(JSON.parse(service).capabilities.audioFormats.count, 6);
   assert.match(feed, new RegExp(`Ring HomePod Doorbell ${JSON.parse(packageJson).version}`));
   assert.match(about, /Created and maintained by Alexander Holzreiter/);
+  assert.match(legal, /Laura Wagner \/ klickwerk/);
+  assert.match(legal, /37872786/);
+  assert.match(llms, /\/impressum\//);
   assert.match(sitemap, /https:\/\/doorbell\.klickwerk\.digital\/about\//);
+  assert.match(sitemap, /https:\/\/doorbell\.klickwerk\.digital\/impressum\//);
 });
 
 test("English marketing copy avoids excessive repetition of the word your", async () => {
